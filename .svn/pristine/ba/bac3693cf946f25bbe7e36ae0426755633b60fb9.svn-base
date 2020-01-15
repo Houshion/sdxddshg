@@ -1,0 +1,95 @@
+<div class="row">
+    <div class="col-xs-12 col-xs-12">
+        <div class="widget radius-bordered">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">rfid编辑</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <form id="AppFormEdit" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+                      data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                    <div class="form-title">
+                        <a href="{:url('Dlc/goods/rfidlist')}" class="btn btn-primary" data-loader="App-loader" data-loadername="用户列表">
+                            <i class="fa fa-mail-reply"></i>返回
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">rfid<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control" name="rfid" placeholder="必填" required="required"
+                                   value="{$rfid['rfid']}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">对应商品<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <select class="form-control" name="goods_id">
+                                <option value="">请选择</option>
+                                {volist name="goods" id="goods"}
+                                <option value="{$goods['goods_id']}" {if condition="$goods['goods_id'] eq $rfid['goods_id']"}selected{/if} >{$goods['title']}</option>
+                                {/volist}
+                            </select>
+                        </div>
+                    </div>
+					<!--<div class="form-group">-->
+                        <!--<label class="col-lg-2 control-label">对应设备<sup>*</sup></label>-->
+                        <!--<div class="col-lg-4">-->
+                            <!--<select class="form-control" name="device_id">-->
+                                <!--<option value="0">请选择</option>-->
+                                <!--{volist name="device" id="device"}-->
+                                <!--<option value="{$device['device_id']}" {if condition="$device['device_id'] eq $rfid['device_id']"}selected{/if} >{$device['title']}</option>-->
+                                <!--{/volist}-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!---->
+                    <!--<div class="form-group">-->
+                        <!--<label class="col-lg-2 control-label">rfid状态<sup>*</sup></label>-->
+                        <!--<div class="col-lg-4">-->
+                            <!--<select class="form-control" name="status" required="required">-->
+                                <!--<option value="0">请选择</option>-->
+                                <!--<option value="1" {eq name = "rfid.status" value="1"}selected{/eq}>未使用</option>-->
+                                <!--<option value="2" {eq name = "rfid.status" value="2"}selected{/eq}>在售</option>-->
+                                <!--<option value="3" {eq name = "rfid.status" value="3"}selected{/eq}>已售</option>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    <!--</div>-->
+					
+                    <div class="form-group">
+                        <div class="col-lg-offset-2 col-lg-4">
+                            <button class="btn btn-primary btn-lg" type="submit" id="save">保存</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--表单验证与提交封装-->
+<script type="text/javascript">
+    $('#AppFormEdit').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+            var tourl = "{:url('/Dlc/goods/rfidedit')}";
+            var data = $('#AppFormEdit').serialize();
+            $.App.ajax('post', tourl, data, null);
+            return false;
+    }});
+</script>

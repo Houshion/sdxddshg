@@ -1,0 +1,275 @@
+<div class="row">
+	<div class="col-xs-12 col-md-12">
+		<div class="widget">
+			<div class="widget-header bg-blue">
+				<i class="widget-icon fa fa-arrow-down"></i>
+				<span class="widget-caption">列表</span>
+				<div class="widget-buttons">
+					<a href="#" data-toggle="maximize">
+						<i class="fa fa-expand"></i>
+					</a>
+					<a href="#" data-toggle="collapse">
+						<i class="fa fa-minus"></i>
+					</a>
+					<a href="#" data-toggle="dispose">
+						<i class="fa fa-times"></i>
+					</a>
+				</div>
+			</div>
+			<div class="widget-body">
+				<div class="table-toolbar">
+					<a href="{:url('Dlc/admin/adminEdit',array('role_id'=>$role_id))}" class="btn btn-primary" data-loader="App-loader" >
+						<i class="fa fa-plus"></i>新增
+					</a>
+                    &nbsp;&nbsp;
+					<a href="{:url('Dlc/role/roleList')}" class="btn btn-info" data-loader="App-loader" >
+						<i class="fa fa-mail-reply"></i>返回
+					</a>
+                    &nbsp;&nbsp;
+                    <a href="#" class="btn btn-danger" id="App-delall">
+						<i class="fa fa-delicious"></i>删除
+					</a>
+				</div>
+
+				<table id="App-table" class="table table-bordered table-hover" >
+					<thead class="bordered-darkorange">
+						<tr role="row">
+							<th width="30px"><div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+									 <label style="padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">
+                                     <span class="text"></span>
+									</label>
+                                </div></th>
+							<th >ID</th>
+							<th >管理员昵称  </th>
+                            <!--<th >图片 </th>-->
+							<eq name="role_id" value=""><th  >权限名称</th><else/></eq>
+                            <th>联系电话 </th>
+							<th>状态 </th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						{volist name="cache" id="vo" empty="$empty"}
+							<tr id="item{$vo.id}">
+								<td>
+									<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+										<label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.id}">
+	                                    <span class="text"></span>
+										</label>
+	                                </div>
+								</td>
+								<td class=" sorting_1">{$vo.id}</td>
+								<td class=" ">{$vo.nickname}</td>
+								<eq name="role_id" value=""><th >{$vo.role_name}</th><else/></eq>
+								<td class=" ">{$vo.mobile}</td>
+								<td class=" " >
+									{eq name="vo.status" value="1"}正常{else/}停封{/eq}
+								</td>
+								<td class="center ">
+									<if condition="$vo['id'] neq 1">
+									<a href="{:url('Dlc/admin/adminEdit',array('id'=>$vo['id'],'role_id'=>$role_id))}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="编辑"><i class="fa fa-edit">编辑</i> </a>&nbsp;&nbsp;
+									<a href="{:url('Dlc/index/authname')}" class="btn btn-danger btn-xs" data-type = "del" data-ajax="{:url('Dlc/Index/authnameDel',array('id'=>$vo['id']))}" ><i class="fa fa-trash-o"></i> 删除</a>
+
+									</if>
+								</td>
+							</tr>
+						{/volist}
+												
+					</tbody>
+				</table>
+				<div class="row DTTTFooter" style="height:44px;">
+					{$page}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script src="__PUBLIC__/Dlc/js/jquery.cookie.js"></script>
+<script type="text/javascript">
+	setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //document.cookie = "username=John Doe";
+    //var username = document.cookie;
+    //console.log(username);
+    //setCookie("name","hayden");
+    //console.log(getCookie("name"));
+    //delCookie("name");
+    //console.log(getCookie("name"));
+    $(document).ready(function(){
+        //delCookie("ids");
+        var ids = getCookie("ids");
+        if(ids.length != 0){
+            var id_list = ids.split(',');
+            var length = id_list.length;
+            $("#App-table .App-check").each(function(){
+                console.log($(this).val());
+                for(var i = 0;i<length;i++){
+                    if($(this).val() == id_list[i]){
+                        $(this).prop("checked","checked");
+                    }
+                }
+            });
+        }
+    });
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    var id = '';
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){
+            $(checks).prop("checked","checked");
+            $(checks).each(function(){
+                id = $(this).val();
+                add_ids(id);
+            });
+        }else{
+            $(checks).removeAttr("checked");
+            $(checks).each(function(){
+                id = $(this).val();
+                delect_ids(id);
+            });
+        }
+    });
+    $(trs).on('click',function(){
+        var c = $(this).find("input[type=checkbox]");
+        id = $(c).val();
+        if($(c).is(":checked")){
+            delect_ids(id);
+            $(c).removeAttr("checked");
+        }else{
+            add_ids(id);
+            $(c).prop("checked","checked");
+        }
+    });
+
+    //添加id到Cookie
+    function add_ids(id){
+        if(!checknum(id))return;
+        var ids = getCookie("ids");
+        var id_list = ids.split(',');
+        var length = id_list.length;
+        var flag = 0;
+        for(var i = 0;i<length;i++){
+            if(id_list[i] == id){
+                flag = 1;
+                break;
+            }
+        }
+        if(flag == 0){
+            if(ids.length == 0){
+                ids = id;
+            }else{
+                ids = ids +','+id;
+            }
+        }
+        setCookie("ids",ids);
+    }
+    //从Cookie删除id
+    function delect_ids(id){
+        var ids = getCookie("ids");
+        var id_list = ids.split(',');
+        var length = id_list.length;
+        for(var i = 0;i<length;i++){
+            if(id_list[i] == id){
+                id_list.splice(i,1);
+                break;
+            }
+        }
+        if(ids.length != 0){
+            ids = id_list.join(',');
+            setCookie("ids",ids);
+        }else{
+            setCookie("ids",'');
+        }
+    }
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+		/*$(checks).each(function(){
+		 chk+=$(this).val()+',';
+		 });*/
+        chk = getCookie("ids");
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax="{:url('Dlc/Advertisement/slideDel')}"+"/id/"+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                delCookie("ids");
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }
+        $.App.confirm("确认要删除吗？",funok);
+    });
+    //设置 cookie 值的函数
+    function setCookie(cname,cvalue,exdays)
+    {
+        var d = new Date();
+        d.setTime(d.getTime()+(exdays*24*60*60*1000));
+        var expires = "expires="+d.toGMTString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+    //获取 cookie 值的函数
+    function getCookie(cname)
+    {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++)
+        {
+            var c = ca[i].trim();
+            if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+        }
+        return "";
+    }
+    //检测 cookie 值的函数
+    function checkCookie()
+    {
+        var user=getCookie("username");
+        if (user!="")
+        {
+            alert("Welcome again " + user);
+        }
+        else
+        {
+            user = prompt("Please enter your name:","");
+            if (user!="" && user!=null)
+            {
+                setCookie("username",user,365);
+            }
+        }
+    }
+    function delCookie(name)
+    {
+        var exp = new Date();
+        exp.setTime(exp.getTime() - 1);
+        var cval=getCookie(name);
+        if(cval!=null)
+            document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+    }
+
+    function checknum(value) {
+        if (isNaN(value)) {
+            return false;
+        }
+        return true;
+    }
+    //删除cookie
+    //document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+</script>
+<!--/全选特效封装-->

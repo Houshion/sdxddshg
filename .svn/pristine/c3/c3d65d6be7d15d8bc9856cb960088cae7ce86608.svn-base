@@ -1,0 +1,232 @@
+<div class="row">
+	<div class="col-xs-12 col-md-12">
+		<div class="widget">
+			<div class="widget-header bg-blue">
+				<i class="widget-icon fa fa-arrow-down"></i>
+				<span class="widget-caption">意见反馈列表</span>
+				<div class="widget-buttons">
+					<a href="#" data-toggle="maximize">
+						<i class="fa fa-expand"></i>
+					</a>
+					<a href="#" data-toggle="collapse">
+						<i class="fa fa-minus"></i>
+					</a>
+					<a href="#" data-toggle="dispose">
+						<i class="fa fa-times"></i>
+					</a>
+				</div>
+			</div>
+			<div class="widget-body">
+				<div class="table-toolbar">
+					<!--<a href="#" class="btn btn-danger" id="App-delall">-->
+						<!--<i class="fa fa-delicious"></i>全部删除-->
+					<!--</a>-->
+
+					<div class="pull-right">
+						<form id="App-search">
+								用户昵称：
+							<label style="margin-bottom: 0px;"><input name="nickname" type="search" class="form-control input-sm" value="{$nickname}" placeholder="用户昵称">
+							</label>&nbsp;&nbsp;
+								手机号：
+							<label style="margin-bottom: 0px;">
+								<input name="mobile" type="text" class="form-control input-sm" value="{$mobile}" placeholder="手机号">
+							</label>
+							 状态：
+	                        <label style="margin-bottom: 0px;">
+                                <select name="status" id="deviceid" class="form-control">
+                                    <option value="">请选择</option>
+                                    <option value="2">未处理</option>
+                                    <option value="1">已处理</option>
+                                </select>
+	                        </label>
+							<a href="{:url('Dlc/Feedback/feedbackList')}" class="btn btn-success" data-loader="App-loader" data-loadername="意见反馈列表" data-search="App-search">
+								<i class="fa fa-search"></i>搜索
+							</a>
+						</form>
+					</div>
+				</div>
+
+				<table id="App-table" class="table table-bordered table-hover">
+					<thead class="bordered-darkorange">
+					<tr role="row">
+						<!--<th width="30px"><div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+							<!--<label style=" padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">-->
+								<!--<span class="text"></span>-->
+							<!--</label>-->
+						<!--</div></th>-->
+						<th>编号</th>
+						<th>订单号</th>
+						<th>反馈用户昵称</th>
+						<th>反馈用户手机号</th>
+						<th>反馈内容 </th>
+						<th>反馈图片 </th>
+						<th>反馈时间</th>
+						<th>状态</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					{volist name="list" id="vo"}
+						<tr >
+							<!--<td>-->
+								<!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+									<!--<label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.id}">-->
+										<!--<span class="text"></span>-->
+									<!--</label>-->
+								<!--</div>-->
+							<!--</td>-->
+							<td class=" sorting_1">{$vo.id}</td>
+							<td class=" ">{if condition="$vo.order_no eq ''"}/{else/}{$vo.order_no}{/if}</td>
+							<td class=" ">{if condition="$vo.nickname eq ''"}/{else/}{$vo.nickname}{/if}</td>
+							<td class=" ">{if condition="$vo.mobile eq ''"}/{else/}{$vo.mobile}{/if}</td>
+							<td class=" ">{$vo.content}</td>
+							<td class=" ">
+								{if condition="$vo.img eq ''"}
+									暂无图片
+								{else/}
+									{volist name="vo.img" id='v'}
+										<a href="http://{$_SERVER['HTTP_HOST']}/public{$v}">
+											<img src="http://{$_SERVER['HTTP_HOST']}/public{$v}" style="width: 60px;height: 60px;">
+										</a> &nbsp;&nbsp;
+									{/volist}
+								{/if}
+							</td>
+							<td class=" ">{$vo.ctime|date='Y-m-d H:i:s',###}</td>
+							<td class=" ">
+								{eq name='vo.status' value='1'} 已处理{/eq}
+								{eq name='vo.status' value='0'} 未处理{/eq}
+							</td>
+							<td class="cente ">
+								
+								<a href="{:url('dlc/feedback/del/')}" class="btn btn-danger btn-xs" data-type = "del" data-ajax="{:url('dlc/feedback/del',array('id'=>$vo['id']))}"><i class="fa fa-trash-o"></i> 删除</a>
+								{if condition="$vo.status eq 0"}
+                                    <!--<a href="{:url('/Dlc/Feedback/edit',['id'=>$vo['id'],'p'=>$p])}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="处理"><i class="fa fa-edit"></i> 处理-->
+                                    <!--</a> &nbsp;-->
+								<a  class="btn btn-info btn-xs"  onclick="changereason('{$vo.id}')"><i class="fa fa-edit"></i> 处理</a>
+                                {else/}
+                                	<a href="{:url('/Dlc/Feedback/info',['id'=>$vo['id'],'p'=>$p])}" class="btn btn-info btn-xs" data-loader="App-loader" data-loadername="详情"><i class="fa fa-eys"></i> 详情
+                                    </a> &nbsp;
+                                {/if}
+							</td>
+
+						</tr>
+					{/volist}
+					</tbody>
+				</table>
+				<div class="row DTTTFooter">
+					{$page}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax="{:url('Dlc/feedback/Del')}"+"/id/"+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }
+        $.App.confirm("确认要删除吗？",funok);
+    });
+
+    function changereason(id) {
+        $.ajax({
+            type: 'post',
+            url:"{:url('/Dlc/Feedback/htedit/')}",
+            data: {'id': id},
+            dataType: "html",
+            success: function (mb) {
+                bootbox.dialog({
+                    message: mb,
+                    title: "处理反馈",
+                    className: "modal-darkorange",
+                    buttons: {
+                        success: {
+                            label: "确定",
+                            className: "btn-blue",
+                            callback: function () {
+                                var f_id = $('.f_id').val();
+                                var dispose_content = $('.dispose_content').val();
+
+                                $.ajax({
+                                    type:"post",
+                                    url:"{:url('/Dlc/Feedback/edit1')}",
+                                    data:{"id": f_id, "dispose_content": dispose_content,},
+                                    dataType:"json",
+                                    success:function (data) {
+                                        if(data.status == 1){
+                                            $.App.alert('success',data.msg,$('#refresh-toggler').trigger('click'));
+                                            $(_this).removeClass('btn-default');
+                                            $(_this).addClass('btn-success');
+                                            $(_this).siblings().removeClass('btn-success btn-default');
+                                            $(_this).siblings().removeClass('btn-default');
+                                        }else{
+                                            $.App.alert('danger',data.msg);
+                                        }
+                                    },
+                                    error:function () {
+                                        $.App.alert('danger', '通讯失败！请重试！');
+                                    }
+                                });
+                                //alert($('#nopass').val());
+                            }
+                        },
+                        "取消": {
+                            className: "btn-danger",
+                            callback: function () {}
+                        }
+                    }
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！1');
+            }
+        })
+    }
+</script>
+<!--/全选特效封装-->

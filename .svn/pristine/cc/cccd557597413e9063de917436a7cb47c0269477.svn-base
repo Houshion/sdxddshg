@@ -1,0 +1,208 @@
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">用户列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+
+
+            <div class="widget-body">
+                <div class="table-toolbar">
+                    <!-- <input type="hidden" name="type" id="hiiden_type" value="{$type}"> -->
+                    <button  class="btn btn-warning" data-loader="App-loader" data-loadername="导出数据" onclick="exportExcel()">导出数据</button>
+                   <!--  <button href="javascript:void(0)" class="btn btn-warning" id="exportTxorder">
+                        <i class="fa fa-download"></i>导出数据
+                    </button>&nbsp;&nbsp; -->
+                    <a href="#" class="btn btn-danger" id="App-delall">
+                        <i class="fa fa-delicious"></i>全部删除
+                    </a>
+
+                    <div class="pull-right">
+                        <form id="App-search">
+                        用户昵称：
+                        <label style="margin-bottom: 0px;">
+                            <input name="nickname" type="search" class="form-control input-sm" value="{$nickname}" placeholder="用户昵称">
+                        </label>  &nbsp;&nbsp;
+                        手机号：
+                        <label style="margin-bottom: 0px;">
+                            <input name="mobile" type="text" class="form-control input-sm" value="{$mobile}" placeholder="手机号">
+                        </label> &nbsp;&nbsp;
+                        帐号类型：
+                        <label style="margin-bottom: 0px;">
+                            <select name="user_type">
+                                <option value="">请选择</option>
+                                <option value="1" {if condition="'1' eq $user_type"} selected{/if}>小程序</option>
+                                <option value="2" {if condition="'2' eq $user_type"} selected{/if}>生活号</option>
+                            </select>
+                        </label>
+                        认证状态：
+                        <label style="margin-bottom: 0px;">
+                            <select name="auth">
+                                <option value="">请选择</option>
+                                <option value="2" {if condition="'2' eq $auth"} selected{/if}>已认证</option>
+                                <option value="1" {if condition="'1' eq $auth"} selected{/if}>未认证</option>
+                            </select>
+                        </label>
+                        <a href="{:url('/shop/user/index/')}" class="btn btn-success" data-loader="App-loader" data-loadername="用户列表" data-search="App-search">
+                            <i class="fa fa-search"></i>搜索
+                        </a>
+                        </form>
+                    </div>
+                </div>
+
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                    <tr role="row">
+                        <th width="30px"><div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+                            <label style=" padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">
+                                <span class="text"></span>
+                            </label>
+                        </div></th>
+                        <th>ID</th>
+                        <th>头像</th>
+                        <th>昵称</th>
+                        <th>电话</th>
+                        <th>余额</th>
+                        <th>实名认证</th>
+                        <th>帐号类型</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {volist name="result" id="vo"}
+                    <tr >
+                        <td>
+                            <div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+                                <label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.user_id}">
+                                    <span class="text"></span>
+                                </label>
+                            </div>
+                        </td>
+                        <td>{$vo['user_id']}</td>
+                        <td><a href="{$vo['head_img']}" target="_blank"><img src="{$vo['head_img']}" style="width: 50px"></a></td>
+                        <td>{$vo['nickname']}</td>
+                        <td>{$vo['mobile']}</td>
+                        <td>{$vo['money']}元</td>
+                        <td>{$vo['auth']}</td>
+                        <td>
+                            {eq name='vo.user_type' value='1'} 小程序{/eq}
+                            {eq name='vo.user_type' value='2'} 生活号{/eq}
+                            {eq name='vo.user_type' value='0'} 暂无{/eq}
+                        </td>
+                        <td>
+                            <div>
+                                <a href="{:url('/shop/user/edit',['user_id'=>$vo['user_id']])}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="编辑"><i class="fa fa-edit"></i> 编辑</a> &nbsp;
+                                <a href="{:url('shop/user/userDiscounts',array('user_id'=>$vo['user_id'],'p'=>$p))}" class="btn btn-blue btn-xs" data-loader="App-loader" data-loadername="优惠卷"><i class="fa fa-eye"></i> 优惠卷</a>&nbsp;&nbsp;
+                                <a href="{:url('shop/user/collect',array('user_id'=>$vo['user_id'],'p'=>$p))}" class="btn btn-info btn-xs" data-loader="App-loader" data-loadername="收藏夹"><i class="fa fa-eye"></i> 收藏夹</a>&nbsp;&nbsp;
+                            </div>
+                            <div>
+                                 <a href="{:url('/shop/user/delete/',['user_id'=>$vo['user_id']])}" class="btn btn-danger btn-xs" data-type = "del" data-ajax="{:url('/Dlc/user/delete',['user_id'=>$vo['user_id']])}" style="margin: 10px 3px 0px 0px"><i class="fa fa-trash-o"></i> 删除</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                </table>
+                <div class="row DTTTFooter">
+                    {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax='/shop/user/clear?user_id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }
+        $.App.confirm("确认要删除吗？",funok);
+    });
+
+    //导出数据
+    function exportExcel(){
+        $.ajax({
+            type: "post",
+            url: "{:url('shop/user/exportSelect')}",
+            //data:{"outh_id":outh_id},
+            dataType: "html",
+            height: 500,
+            success: function(mb) {
+                //console.log(mb),
+                bootbox.dialog({
+                    message: mb,
+                    title: "导出筛选",
+                    buttons: {}
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+
+    // //导出数据
+    // $('#exportTxorder').on('click',function(){
+    //     window.open("{:url('dlc/user/userExport')}");
+    // })
+</script>
+<!--/全选特效封装-->

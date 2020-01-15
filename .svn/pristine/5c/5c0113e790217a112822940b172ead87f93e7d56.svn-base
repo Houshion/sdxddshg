@@ -1,0 +1,156 @@
+
+<div class="row">
+    <div class="col-xs-12 col-xs-12">
+        <div class="widget radius-bordered">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">广告编辑</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <form id="AppForm" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+                      data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                    <div class="form-title">
+                        <a href="{:url('shop/System/banner')}"  id="refresh-back" class="btn btn-primary" data-loader="App-loader" data-loadername="广告列表">
+                            <i class="fa fa-mail-reply"></i>返回
+                        </a>
+                    </div>
+                    <input type="hidden" name="banner_id" value="{$find.banner_id}">
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">标题<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control" name="title" placeholder="必填" required="required"
+                                   value="{$find.title}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">广告内容</label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control" name="image" placeholder="必填"  data-bv-notempty-message="不能为空" value="{$find.image}">
+                        </div>
+                        <div class="wu-example uploader" >
+                            <!--用来存放文件信息-->
+                            <div class="uploader-list"></div>
+                            <div class="btns">
+                                <div id="image" class="picker">选择文件</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--<div class="form-group">-->
+                        <!--{if condition="empty($result['url']) neq true"}-->
+                        <!--<input type="text"  style="width: 520px; margin-left: 15px" value="{$result.url}"  />-->
+                        <!--{/if}-->
+                    <!--<label class="col-sm-2 control-label">广告内容</label>-->
+                    <!--<div class="col-sm-10">-->
+                    <!--<input type="file"  id="upfile" value="" />-->
+                    <!--&lt;!&ndash;<input type="button" value="上传" id="btn"/>&ndash;&gt;-->
+
+                    <!--<input type="hidden"  value=""  name="url" id="rfid"/>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="form-group">-->
+                        <!--<label class="col-lg-2 control-label">商品图片</label>-->
+                        <!--<div class="col-lg-4">-->
+                            <!--<div class="input-group input-group-sm">-->
+                                <!--<input type="text" class="form-control" name="img" value="{$result.img}" id="App-pic" data-bv-notempty-message="不能为空">-->
+                                <!--<span class="input-group-btn">-->
+                                    <!--<button class="btn btn-default shiny" type="button" onclick="appImgviewer('App-pic','1')">-->
+                                        <!--<i class="fa fa-camera-retro"></i>预览</button>-->
+                                    <!--<button class="btn btn-default shiny" type="button" onclick="appImguploader('App-pic',false,'1')">-->
+                                        <!--<i class="glyphicon glyphicon-picture"></i>上传</button>-->
+                                <!--</span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <div class="form-group">
+                        <div class="col-lg-offset-2 col-lg-4">
+                            <button class="btn btn-primary btn-lg" type="submit" id="save">保存</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--表单验证与提交封装-->
+<script type="text/javascript">
+    $('#AppForm').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+            var tourl = "{:url('/shop/System/bannerset')}";
+            var data = $('#AppForm').serialize();
+            var back = $('#back').serialize();
+
+
+            var funok=function(){
+                var callok=function(){
+                    //成功删除后刷新
+                    $('#refresh-back').trigger('click');
+                    return false;
+                };
+                var callerr=function(){
+                    //拦截错误
+                    return false;
+                };
+                $.App.ajax('post',tourl,data,callok,callerr);
+            }
+            funok();
+
+        }});
+
+    $('#save').click(function () {
+        var type = $("select[name='type_id']").val();
+        if (type == false) {
+            alert('请选择类型');
+            return;
+        }
+    })
+
+    $(".picker").each(function(){
+        var upid = $(this).attr('id');
+        var uploader = WebUploader.create({
+
+            auto: true,
+            // swf文件路径
+            swf: '/public/static/webuploader/Uploader.swf',
+
+            // 文件接收服务端。
+            server: '/dlc/upload/bin',
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#' + upid,
+
+            // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+            resize: false,
+        });
+
+        uploader.on('uploadSuccess', function (file,data) {
+            if(data.code == 1) {
+                $.App.alert('danger', '上传成功！');
+                $('input[name="'+upid+'"').val(data.data);
+            } else {
+                layer.msg(data.msg);
+            }
+        });
+    })
+
+
+</script>

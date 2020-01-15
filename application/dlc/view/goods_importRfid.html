@@ -1,0 +1,68 @@
+<style>
+	.modal-content{height:420px;}
+</style>
+<div class="col-lg-12" style="margin-left: 10px;width: 510px; height: auto; margin-top:20px;" id="">
+	<form id="AppForm2" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+   	 <input type="hidden" name="goods_id" id="goods_id" value="{$goods_id}" />
+		<div class="form-group">
+        	<label class="col-sm-4 control-label">rfid列表(,号分割)</label>
+            <div class="col-sm-8">
+                  <textarea class="form-control rfid" id="rfid" name="rfid" rows="10"></textarea>
+            </div>
+         </div>
+		 <div class="form-group">
+                        <label class="col-sm-4 control-label">上传rfid文本(txt)</label>
+                        <div class="col-sm-8">
+                            <input type="file" name="upfile" id="upfile" value="" />
+                            <!--<input type="button" value="上传" id="btn"/>-->
+                        </div>
+                    </div>
+		<div class="form-group">
+            <div class="col-lg-offset-2 col-lg-4">
+            <button id="pre1" style="margin-top: 5px; width:100px;" class="btn btn-primary" type="submit">保存</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+        </div>	
+	</form>
+</div>
+<script type="text/javascript">
+	// 时间选择框
+	
+    $('#AppForm2').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+			var data = $('#AppForm2').serialize();
+			console.log(data);
+            var tourl="{:url('dlc/goods/rfidSave')}"
+			$('.close').click();
+			$.App.ajax('post', tourl, data, refreshToggler);
+			//window.location.href = "{:url('dlc/goods/rfid')}?goods_id="+data["goods_id"];
+            return false;
+			//console.log(tourl);
+			//
+			
+        },
+    });
+	
+	function refreshToggler(){
+		$("#refresh-toggler").click();
+	}
+	document.getElementById("upfile").addEventListener('change',function () {
+        var formData = new FormData();
+        formData.append("pic",document.getElementById("upfile").files[0]);
+        $.ajax({
+            type: "POST", // 数据提交类型
+            url: "/dlc/goods/get_rfid", // 发送地址
+            data: formData, //发送数据
+            async: true, // 是否异步
+            success:function(res){
+                if (res.code == 2){
+                    alert('文件类型错误！');
+                    return;
+                }
+                $('#rfid').val(res.data);
+            },
+            processData: false, //processData 默认为false，当设置为true的时候,jquery ajax 提交的时候不会序列化 data，而是直接使用data
+            contentType: false //
+        });
+    })
+</script>

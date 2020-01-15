@@ -1,0 +1,105 @@
+<div class="row">
+    <div class="col-xs-12 col-xs-12">
+        <div class="widget radius-bordered">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">编辑角色</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <form id="AppForm" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                    <input type="hidden" name="id" value="{$res.role_id}">
+                    <div class="form-title">
+                        <a href="{:url('Dlc/role/roleList')}" class="btn btn-primary" data-loader="App-loader" data-loadername="角色权限列表">
+                            <i class="fa fa-mail-reply"></i>返回
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">角色名称：<sup>*</sup></label>
+                        <div class="col-lg-6" style="border:1px solid #ccc;">
+                            <input type="text" class="form-control" style="border: 0;" name="role_name" placeholder="必填" data-bv-notempty="true" data-bv-notempty-message="不能为空" value="{$res.role_name}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">角色权限：<sup>*</sup></label>
+                        <div class="col-lg-6" style="border:1px solid #ccc;padding-top: 10px;">
+                            {volist name="oath1" id="vo"}
+                                <ul style="list-style:none;">
+                                    <label>
+                                        <input {eq name="vo['oath_id']" value="1"} disabled {/eq} type="checkbox" pid="{$vo['oath_id']}" class="colored-blue oa-check pid" {in name="vo.oath_id" value="$res.auth"} checked="checked" {/in} value="{$vo.oath_id}" data-label="{$vo.name}">
+                                        <span class="text">{$vo.name}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    </label>
+                                    <li style="margin-left: 30px;">
+                                        {volist name="oath2" id="bo" key="k"}
+                                            {eq name="bo['parent_id']" value="$vo['oath_id']" }
+                                                <label>
+                                                    <input type="checkbox" {eq name="bo['parent_id']" value="1"} disabled {/eq} class="colored-blue oa-check pid_{$bo['parent_id']}" {in name="bo.oath_id" value="$res.auth"} checked="checked" {/in} value="{$bo.oath_id}" data-label="{$bo.name}">
+                                                    <span class="text">{$bo.name}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                                </label>
+                                            {/eq}
+                                        {/volist}
+                                    </li>
+                                </ul>
+                            {/volist}
+                        </div>
+                        <input type="hidden" name="oath" id="oath" />
+                        <input type="hidden" name="role_id" value="{$res.role_id}" />
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-2 col-lg-4">
+                            <button class="btn btn-primary btn-lg" type="submit">保存</button>&nbsp;&nbsp;
+                            <button class="btn btn-palegreen btn-lg" type="reset">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--表单验证与提交封装-->
+<script type="text/javascript">
+    $('#AppForm').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+            var oa='';
+            var checks=$('.oa-check');
+            $(checks).each(function(){
+                if($(this).is(":checked")){
+                    oa += $(this).val()+',';
+                }
+            });
+            $('#oath').val(oa);
+            var tourl="{:url('Dlc/role/roleDetail')}";
+            var data=$('#AppForm').serialize();
+            $.App.ajax('post',tourl,data,null);
+            return false;
+        },
+    });
+
+    $('.pid').click(function(){
+        var pid = $(this).attr('pid');
+        if($(this).is(":checked")) {
+            $('.pid_'+pid).prop('checked',true);
+        } else {
+            $('.pid_'+pid).prop('checked',false);
+        }
+    })
+
+</script>
+<!--/表单验证与提交封装-->

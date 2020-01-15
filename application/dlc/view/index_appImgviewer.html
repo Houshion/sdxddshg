@@ -1,0 +1,9 @@
+<div style="text-align: center; width: 570px; overflow: hidden;">
+	{volist name="cache" id="vo"}
+		{if condition="$type GT 0"}
+			<img src="{$Think.config.website}public/{$vo}" width="100%" /><br><br>
+		{else/}
+			<img src="{$Think.config.website}public/{$vo.savepath}{$vo.savename}" width="100%" /><br><br> 
+		{/if}
+	{/volist}
+</div>

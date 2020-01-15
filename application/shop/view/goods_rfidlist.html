@@ -1,0 +1,172 @@
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">rfid列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="table-toolbar">
+                    <!--<button type="file" class="btn btn-primary" data-loader="App-loader" data-loadername="导入rfid" onclick="importRfid()">-->
+                    <!--<i class="fa fa-download"></i>导入rfid</button>-->
+                    <!--<a href="#" class="btn btn-wa" id="App-delall">
+                        <i class="fa fa-info"></i>
+                    </a>-->
+
+                    <div class="pull-right" style="padding-bottom: 10px">
+                        <form id="App-search">
+                            商品名：<label style="margin-bottom: 0px;">
+                            <input name="goodsname" type="search" class="form-control input-sm" value="{$goodsname}" placeholder="商品名">
+                        </label>  &nbsp;&nbsp;
+                            设备名：<label style="margin-bottom: 0px;">
+                            <input name="devicename" type="search" class="form-control input-sm" value="{$devicename}" placeholder="设备名">
+                        </label>  &nbsp;&nbsp;
+                            rfid：<label style="margin-bottom: 0px;">
+                            <input name="rfid" type="search" class="form-control input-sm" value="{$rfid}" placeholder="rfid">
+                        </label>  &nbsp;&nbsp;
+
+                            状态：<label style="margin-bottom: 0px;">
+                            <select name="status" class="form-control select-sm" type="search">
+                                <option value="0" >所有状态</option>
+                                <option value="1"  {if condition="$status eq 1"}selected{/if}>未使用</option>
+                                <option value="2"  {if condition="$status eq 2"}selected{/if}>在售</option>
+                                <option value="3"  {if condition="$status eq 3"}selected{/if}>已售</option>
+                            </select>
+                        </label> &nbsp;&nbsp;
+
+                            <a href="{:url('/shop/goods/rfidlist/')}" class="btn btn-success" data-loader="App-loader" data-loadername="" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                    <tr role="row">
+                        <!--<th width="30px"><div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                            <!--<label style=" padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">-->
+                                <!--<span class="text"></span>-->
+                            <!--</label>-->
+                        <!--</div></th>-->
+                        <th>rfid</th>
+                        <th>商品名</th>
+                        <th>所在设备</th>
+                        <!--<th>所属商家</th>-->
+                        <!--<th>批次</th>-->
+                        <th>状态</th>
+
+                        <th>操作</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {volist name="list" id="vo"}
+                    <tr>
+
+                        <td>{$vo['rfid']}</td>
+                        <td>{$vo['goodsname']}</td>
+                        <td>{$vo['devicename']}</td>
+                        <!--<td>{$vo['shopname']}</td>-->
+                        <!--<td>{$vo['batch']}</td>-->
+                        <td>
+                        	{if condition="$vo.status eq 1"}
+                            <font color="#d73d32">未使用</font>
+                            {elseif condition="$vo.status eq 2" /}
+                            <font color="#57b5e3">在售</font> 
+                            {else/}
+                            <font color="#53a93f">已售</font>
+                            {/if}
+                        </td>
+                        <td>
+
+                            <a href="{:url('/shop/goods/rfiddel/',['rfid'=>$vo['rfid']])}" class="btn btn-danger btn-xs" data-type = "del" data-ajax="{:url('/shop/goods/rfiddel',['rfid'=>$vo['rfid']])}" data-content="你确认将该rfid删除，删除后不可恢复!" ><i class="fa fa-trash-o"></i> 删除</a>
+                        </td>
+                        <!--{if condition="$type eq 1"}-->
+                        <!--<td>-->
+                          <!--&lt;!&ndash;   <a href="{:url('/shop/goods/rfidedit',['rfid'=>$vo['rfid']])}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="编辑"><i class="fa fa-edit"></i> 编辑</a> &nbsp;&nbsp; &ndash;&gt;-->
+                            <!--{if condition="$vo.status neq 2"}-->
+                            <!--<a href="{:url('/shop/goods/rfid')}" class="btn btn-info btn-xs" data-loader="App-loader" data-type="confirm" data-loadername="设为在售" data-content="你确认将该rfid设为在售，设为在售，用户将可以再次购买该rfid对应的商品" data-ajax = "{:url('/shop/goods/rfidStatus',['rfid'=>$vo['rfid'],'status'=>2])}" ><i class="fa fa-arrow-up"></i>设为在售</a> &nbsp;&nbsp;-->
+                            <!--{/if}-->
+                            <!--{if condition="$vo.status neq 3"}-->
+                            <!--<a href="{:url('/shop/goods/rfid')}" class="btn btn-warning btn-xs" data-loader="App-loader" data-type="confirm" data-loadername="设为已售" data-content="你确认将该rfid设为已售，设为已售，用户将可以不能购买该rfid对应的商品" data-ajax = "{:url('/shop/goods/rfidStatus',['rfid'=>$vo['rfid'],'status'=>3])}"><i class="fa fa-arrow-down"></i>设为已售</a> &nbsp;&nbsp;-->
+                            <!--{/if}-->
+                        <!--</td>-->
+                        <!--{/if}-->
+                    </tr>
+                    {/volist}
+                    </tbody>
+                </table>
+                <div class="row DTTTFooter">
+                    {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax='/shop/goods/clear?goods_id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }
+        $.App.confirm("确认要删除吗？",funok);
+    });
+</script>
+<!--/全选特效封装-->

@@ -1,0 +1,240 @@
+<link rel="stylesheet" href="{$Think.config.dlccss}datepicker.css" />
+<script src="{$Think.config.dlcjs}bootstrap-datepicker.min.js"></script>
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">设备订单列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="table-toolbar">
+                    <a href="{:url('/shop/device/index/',array('p'=>$pages))}" class="btn btn-primary" data-loader="App-loader" data-loadername="设备列表">
+                        <i class="fa fa-mail-reply"></i>返回
+                    </a>
+                    <!-- <a href="#" class="btn btn-danger" id="App-delall">
+                        <i class="fa fa-delicious"></i>全部删除
+                    </a> -->
+                    <div class="pull-right">
+                        <form id="App-search">
+                            开始时间：
+                            <label style="margin-bottom: 0px;">
+                                <input readonly="readonly" class="form-control search-query date-picker" style="width:120px;float:none;" name="start" value="{$start}" placeholder="开始时间" type="text">
+                            </label>
+                            &nbsp;至&nbsp;
+                            <label style="margin-bottom: 0px;">
+                                <input class="form-control search-query date-picker " style="width:120px;float:none;" name="end" readonly="readonly" value="{$end}" placeholder="结束时间" type="text">
+                            </label>
+                            用户昵称：
+                            <label style="margin-bottom: 0px;">
+                                <input name="username" type="text" class="form-control input-sm" value="{$username}" placeholder='用户昵称'>
+                            </label>  &nbsp;&nbsp;
+                             订单编号：
+                            <label style="margin-bottom: 0px;">
+                                <input name="order_number" type="text" class="form-control input-sm" value="{$order_number}" placeholder='订单编号'>
+                            </label>  &nbsp;&nbsp;
+                            订单状态:
+                            <label style="margin-bottom: 0px;">
+                               <select name='status'>
+                                   <option value="">请选择</option>
+                                   <option value="1"{if condition="$status eq '1'"} selected{/if}>未完成</option>
+                                   <option value="2"{if condition="$status eq '2'"} selected{/if}>未支付</option>
+                                   <option value="3"{if condition="$status eq '3'"} selected{/if}>已支付</option>
+                               </select>
+                            </label>  &nbsp;&nbsp;
+                            <!--支付类型:-->
+                            <!--<label style="margin-bottom: 0px;">-->
+                               <!--<select name='pay_type'>-->
+                                   <!--<option value="">请选择</option>-->
+                                   <!--<option value="1"{if condition="$pay_type eq '1'"} selected{/if}>微信</option>-->
+                                   <!--<option value="2"{if condition="$pay_type eq '2'"} selected{/if}>支付宝</option>-->
+                                   <!--<option value="3"{if condition="$pay_type eq '3'"} selected{/if}>余额</option>-->
+                               <!--</select>-->
+                            <!--</label>  &nbsp;&nbsp;-->
+                           <!--  设备编号：
+                            <label style="margin-bottom: 0px;">
+                                <input name="macno" type="text" class="form-control input-sm" value="{$macno}" placeholder="设备编号">
+                            </label>  &nbsp;&nbsp;
+                            设备地址：
+                            <label style="margin-bottom: 0px;">
+                                <input name="address" type="text" class="form-control input-sm" value="{$address}" placeholder="设备地址">
+                            </label>  &nbsp;&nbsp; -->
+                            <a href="{:url('/shop/device/order/',array('page'=>$pages,'device_id'=>$device_id))}" class="btn btn-success" data-loader="App-loader" data-loadername="设备商品列表" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                        <tr role="row">
+                            <!--<th width="30px">-->
+                                <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                                    <!--<label style="padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">-->
+                                     <!--<span class="text"></span>-->
+                                    <!--</label>                                    -->
+                                <!--</div>-->
+                            <!--</th>-->
+                            <th>ID</th>
+                            <th>用户昵称</th>
+                            <th>设备编号</th>
+                            <th>订单号</th>
+                            <th>交易号</th>
+                            <th>商品信息</th>
+                            <th>总金额</th>
+                            <th>支付金额</th>
+                            <th>订单优惠</th>
+                            <th>购买数量</th>
+                            <th>订单状态</th>
+                            <th>支付类型</th>
+                            <th>创建时间</th>
+                            <th>支付时间</th>
+                            <!-- <th>操作</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {volist name="result" id="vo" empty= "$empty"}
+                            <tr id="item{$vo.order_id}">
+                                <!--<td >-->
+                                    <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                                        <!--<label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.order_id}">-->
+                                         <!--<span class="text"></span>-->
+                                        <!--</label>                                    -->
+                                    <!--</div>-->
+                                <!--</td>-->
+                                <td class=" sorting_1" width="30px">{$vo.order_id}</td>
+                                <td class=" ">{$vo.nickname}</td>
+                                <td class=" ">{$vo.macno}</td>
+                                <td class=" ">{$vo.order_number}</td>
+                                <td class=" ">
+                                    {if condition="$vo.trade_number eq ''"}
+                                        暂无
+                                    {else/}
+                                        {$vo.trade_number}
+                                    {/if}
+                                </td>
+                                <td class=" ">
+                                    {volist name="vo.goods" id="v"}
+                                        <b>{$v.title} X {$v.num} 单价:¥{$v.price}</b><br/>
+                                    {/volist}
+                                </td>
+                                <td class=" ">{$vo.total_price}</td>
+                                <td class=" ">{$vo.pay_price}</td>
+                                <td class=" ">
+                                    {if condition="$vo.discount_id neq  0"}
+                                        优惠金额：¥{$vo.discount_money}
+                                    {else/}
+                                        没有优惠
+                                    {/if}
+                                </td>
+                                <td class=" ">{$vo.num} 件</td>
+                                <td class=" ">
+                                    {eq name="vo.status" value="1"} <b>未完成</b> {/eq}
+                                    {eq name="vo.status" value="2"} <b>未支付</b> {/eq}
+                                    {eq name="vo.status" value="3"} <b>已支付</b> {/eq}
+                                </td>
+                                <td class=" ">
+                                    {eq name="vo.pay_type" value="1"} <b style="color: green;">微信支付</b> {/eq}
+                                    {eq name="vo.pay_type" value="2"} <b style="color: blue;">支付宝支付</b> {/eq}
+                                    {eq name="vo.pay_type" value="3"} <b style="color: yellow;">余额支付</b> {/eq}
+                                </td>
+                                <td class=" ">{$vo.ctime|date='Y-m-d H:i:s',###}</td>
+                                <td class=" ">
+                                    {if condition="$vo.pay_time eq 0"}
+                                        暂无
+                                    {else/}
+                                        {$vo.pay_time|date='Y-m-d H:i:s',###}
+                                    {/if}
+                                </td>
+                               <!--  <td class="center ">
+                                    <a href="{:url('Dlc/device/orderInfo',array('device_id'=>$vo['device_id'],'page'=>$pages,'device_goods_id'=>$vo.device_goods_id))}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="查看订单详情"><i class="fa fa-eye"></i> 查看订单详情</a>&nbsp;&nbsp; -->
+                                  <!--   <a href="{:url('Dlc/device/goods',array('device_id'=>$vo['device_id'],'p'=>$p))}" class="btn btn-info btn-xs" data-loader="App-loader" data-loadername="所属商品"><i class="fa fa-list"></i>所属商品</a>&nbsp;&nbsp; 
+                                    <a href="{:url('Dlc/device/del',array('device_id'=>$vo['device_id']))}" class="btn btn-danger btn-xs" data-type = "del" data-ajax="{:url('Dlc/device/del',array('device_id'=>$vo['device_id']))}"><i class="fa fa-trash-o"></i> 删除</a>  -->
+                                    
+                                <!-- </td> -->
+                            </tr>
+                        {/volist}
+                                                
+                    </tbody>
+                    
+                </table>
+                 <!-- style="line-height: 32px; height: 32px;" -->
+                <div class="row DTTTFooter">
+                {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){         
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }       
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }       
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax="{:url('/Dlc/device/del')}"+"/device_id/"+chk;
+        // var toajax='/Dlc/device/del?device_id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }                       
+        $.App.confirm("确认要删除吗？",funok);
+    });
+    $('.date-picker').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    });
+</script>
+<!--/全选特效封装-->

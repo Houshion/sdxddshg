@@ -1,0 +1,198 @@
+<style>
+    .table>thead>tr>th,
+    .table>tbody>tr>th,
+    .table>tfoot>tr>th,
+    .table>thead>tr>td,
+    .table>tbody>tr>td,
+    .table>tfoot>tr>td {
+        /*  padding: 8px;
+          line-height: 1.42857143;*/
+        vertical-align: middle;
+        /*  border-top: 1px solid #ddd;*/
+    }
+</style>
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">红冲订单列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="table-toolbar">
+                    <!--<button  class="btn btn-warning" data-loader="App-loader" data-loadername="导出数据" onclick="exportExcel()">导出数据</button>-->
+                   <!--  <a href="{:url('Dlc/device/set')}" class="btn btn-primary" data-loader="App-loader" data-loadername="新增设备">
+                        <i class="fa fa-plus"></i>新增设备
+                    </a>&nbsp;&nbsp; -->
+                    <a href="{:url('Dlc/order/index')}" class="btn btn-primary" data-loader="App-loader" data-loadername="订单列表">
+                        <i class="fa fa-mail-reply"></i>返回
+                    </a>&nbsp;&nbsp;
+                    <div class="pull-right">
+                        <form id="App-search">
+                            <input name="order_id" type="hidden" class="form-control input-sm" value="{$order_id}">
+                            订单编号：
+                            <label style="margin-bottom: 0px;">
+                                <input name="order_number" type="text" class="form-control input-sm" value="{$order_number}" placeholder="订单编号" style="width: 200px;">
+                            </label>  &nbsp;&nbsp;
+                            商品名称：
+                            <label style="margin-bottom: 0px;">
+                                <input name="title" type="text" class="form-control input-sm" value="{$title}" placeholder="商品名称">
+                            </label>  &nbsp;&nbsp;
+                            操作人：
+                            <label style="margin-bottom: 0px;">
+                                <input name="nickname" type="text" class="form-control input-sm" value="{$nickname}" placeholder="操作人">
+                            </label>  &nbsp;&nbsp;
+
+                            <a href="{:url('/Dlc/order/redorderlist/')}" class="btn btn-success" data-loader="App-loader" data-loadername="订单列表" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+                <div id="tableDiv" style="width:100%;overflow-x:auto;">
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange"  width="auto"  style="white-space:nowrap">
+                        <tr role="row">
+                            <!--<th width="30px">-->
+                                <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                                    <!--<label style="padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">-->
+                                     <!--<span class="text"></span>-->
+                                    <!--</label>                                    -->
+                                <!--</div>-->
+                            <!--</th>-->
+                            <th>ID</th>
+                            <th>订单编号</th>
+                            <th>商品名称</th>
+                            <th>红冲金额</th>
+                            <th>操作人</th>
+                            <th>创建时间</th>
+                            <!--<th>操作</th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {volist name="list" id="vo" empty= "$empty"}
+                            <tr id="item{$vo.charging_id}"  {if condition="$vo.is_red eq 2 "} style="color: red;"{/if}>
+                                <!--<td>-->
+                                    <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                                        <!--<label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.order_id}">-->
+                                         <!--<span class="text"></span>-->
+                                        <!--</label>                                    -->
+                                    <!--</div>-->
+                                <!--</td>-->
+                                <td class=" sorting_1" width="30px">{$vo.charging_id}</td>
+                                <td class=" ">{$vo.order_number}</td>
+                                <td class=" ">{$vo.title}</td>
+                                <td class=" ">{$vo.charging_price}</td>
+                                <td class=" ">{$vo.nickname}</td>
+                                <td class=" ">{$vo.ctime|date='Y-m-d H:i:s',###}</td>
+                                <!--<td class="center ">-->
+                                   <!---->
+                                    <!---->
+                                    <!---->
+                                <!--</td>-->
+                            </tr>
+                        {/volist}
+                                                
+                    </tbody>
+                </table>
+
+                </div>
+                 <!-- style="line-height: 32px; height: 32px;" -->
+                <div class="row DTTTFooter">
+                {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){         
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }       
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }       
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax="{:url('/Dlc/device/del')}"+"/device_id/"+chk;
+        // var toajax='/Dlc/device/del?device_id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }                       
+        $.App.confirm("确认要删除吗？",funok);
+    });
+
+
+    //导出数据
+    function exportExcel(){
+        $.ajax({
+            type: "post",
+            url: "{:url('dlc/order/exportSelect')}",
+            //data:{"outh_id":outh_id},
+            dataType: "html",
+            height: 500,
+            success: function(mb) {
+                //console.log(mb),
+                bootbox.dialog({
+                    message: mb,
+                    title: "导出筛选",
+                    buttons: {}
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+</script>
+<!--/全选特效封装-->

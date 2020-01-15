@@ -1,0 +1,377 @@
+<div class="row">
+     <div class="col-xs-12 col-xs-12">
+          <div class="widget radius-bordered">
+              <div class="widget-header bg-blue">
+				<i class="widget-icon fa fa-arrow-down"></i>
+				<span class="widget-caption">后台菜单</span>
+				<div class="widget-buttons">
+					<a href="#" data-toggle="maximize">
+						<i class="fa fa-expand"></i>
+					</a>
+					<a href="#" data-toggle="collapse">
+						<i class="fa fa-minus"></i>
+					</a>
+					<a href="#" data-toggle="dispose">
+						<i class="fa fa-times"></i>
+					</a>
+				</div>
+			</div>
+              <div class="widget-body">
+              	<div class="table-toolbar">
+                <button class="btn btn-primary" data-loader="App-loader" data-loadername="新增农场" onclick="roleAdd()">
+					<i class="fa fa-plus"></i>添加菜单
+				</button>
+                </div>
+                <form id="AppForm" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                <div class="form-group" style="margin-top:12px;">
+                      <div class="col-lg-12">
+                        {volist name="oath1" id="vo"}
+                          <ul style="list-style:none;" class="xxobx">
+                            <label>
+                            {eq name="vo['oath_id']" value="1"}
+                            <input type="radio" disabled="true" name="radio" onclick="prev1(this)" class="colored-blue oa-check oath_id" value="{$vo.oath_id}" data-label="{$vo.name}" >
+                            {else/}
+                            <input type="radio" name="radio" onclick="roleEdit(this)" class="oath_id colored-blue oa-check" value="{$vo.oath_id}" data-label="{$vo.name}" >
+                            {/eq}
+                            <span class="text">{$vo.name}</if>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            </label>
+                            <li style="margin-left: 30px;">
+                            {volist name="oath2" id="bo" key="k"}
+                                {eq name="bo['parent_id']" value="$vo['oath_id']"}
+                                  <label>
+                                    <input type="radio" name="radio"  onclick="roleEdit(this)" class="oath_id colored-blue oa-check" value="{$bo.oath_id}" data-label="{$bo.name}">
+                                    <span class="text">{$bo.name}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                  </label>
+                                {/eq}
+                             {/volist}
+                            </li>
+                          </ul>
+                        {/volist}
+                        <input type="radio" name="radio" onclick="Idc(this)" class="colored-blue oa-check" value="{$bo.oath_id}" data-label="{$bo.name}" style="display: none">
+                        <span class="text" style="display: none">{$bo.name}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                      </div>
+                      <div id="bottom" style="margin-top:12px;">
+                          <input type="hidden" name="oath_id" value="" />  <!-- 修改时候获取当前点击的oath_id -->
+                          <input type="hidden" name="inp" value=""> <!-- 修改时候获取当前点击的菜单类型  1：导航菜单，2：子菜单 -->
+                          <input type="text" style="display: none;margin-top: 5px;" class="form-control" name="order" value="" placeholder="排序" />
+                          <button id="pre" style="display: none;margin-top: 5px;" class="btn btn-primary" type="submit">保存</button>
+                          <button id="del" style="display: none;margin-top: 5px;" onclick="del_oath();" class="btn btn-danger">删除</button>
+                      </div>
+                </div>
+                </form>
+              </div>
+        </div>
+	</div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+	setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<script type="text/javascript">
+$('#AppForm').bootstrapValidator({
+	submitHandler: function(validator, form, submitButton) {
+		var oa = '';
+		var checks = $('.oa-check');
+		$(checks).each(function() {
+			if ($(this).is(":checked")) {
+				oa += $(this).val() + ',';
+			}
+		});
+		$('#oath').val(oa);
+		var tourl = "{:url('dlc/index/oathDetail')}";
+		var data = $('#AppForm').serialize();
+		$.App.ajax('post', tourl, data, null);
+		return false;
+	},
+});
+
+var checkall = $('#App-table .check-one');
+$(checkall).on('click', function() {
+	var ids = $(this).attr('parent');
+ 	var num = $("input[parent=" + ids + "]").length;
+ 	var checked_num = $("input[parent=" + ids + "]:checked").length;
+ 	if (!$(this).is(":checked")) {
+ 		$('#' + ids).removeAttr("checked");
+ 	}
+ 	if (num == checked_num) {
+ 		$('#' + ids).prop("checked", "checked");
+ 	}
+});
+$(document).ready(function() {
+ 	$("label[yc=1]").prop("style", "display:none;");
+ 	$("label[parent=1]").prop("style", "display:none;");
+ 	$("ul[yc=1]").prop("style", "display:none;");
+});                            
+
+var chk = $('#App-table .checkall');
+$(chk).on('click', function() {
+	var fath = $(this).attr('id');
+	if ($(this).is(":checked")) {
+		$("input[parent = " + fath + "]").prop("checked", "checked");
+	} else {
+		$("input[parent = " + fath + "]").removeAttr("checked");
+	}
+});
+
+function linkage(value) {
+	var parent_id = value;
+	if (parent_id) {
+		$.post('/Index/linkage', {
+			parent_id: parent_id
+		}, function(a) {
+			$("select[name='menu_id']").empty();
+			$("select[name='menu_id']").append("<option value='0'>请选择</option>");
+			if (a.status) {
+				$.each(a.data, function(k, v) {
+					$('select[name="menu_id"]').append("<option value=" + v.oath_id + ">" + v.name + "</option>");
+				})
+			} else {
+				$("select[name='menu_id']").empty();
+				$("select[name='menu_id']").append("<option value='0'>请选择</option>");
+			}
+		})
+	}
+}
+
+function change(obj) {
+	var val = $(obj).val();
+	$('input[name="radio"]').removeAttr('checked');
+	$('#opName').text('添加');
+	$('#bottom>input').val('');
+	if (val == 1) {
+		$('#addMenu').hide();
+		$('input[name="navName"]').val('');
+		$('#addNav').show();
+	} else if (val == 2) {
+		$('#addNav').hide();
+		$('#addMenu>input').val('');
+		$('#addMenu').show();
+	}
+	$('input[name="order"]').show();
+	$('#pre').show();
+}
+
+function Idc(obj) {
+	$.post('/Index/checkId', {
+		oath_id: $(obj).val()
+	}, function(a) {
+		$('select[name="menu_id"]').empty();
+		$('select[name="menu_id"]').append("<option value='0'>请选择</option>");
+		$('select[name="sel"]').val(0);
+		if (a.status) {
+			$('input[name="oath_id"]').val(a.data['oath_id']);
+			$('#opName').text('修改');
+			if (a.msg == 1) {
+				$('input[name="inp"]').val(1);
+				$('input[name="navName"]').val(a.data['name']);
+				$('#addMenu').hide();
+				$('#addNav').show();
+			} else {
+				$('input[name="inp"]').val(2);
+				$('input[name="name"]').val(a.data['name']);
+				$('input[name="url"]').val(a.data['url']);
+				$('select[name="parent_id"]').val(a.data['parent_id']);
+				linkage(a.data['parent_id']);
+				if (a.data['is_menu'] == 0) {
+					$('select[name="menu_id"]').val(a.data['menu_id']);
+				}
+				$('#addNav').hide();
+				$('#addMenu').show();
+			}
+			$('input[name="order"]').val(a.data['order']).show();
+			$('#del').show(); //修改时候出现删除按钮
+			$('#pre').show(); //修改时候出现保存按钮
+		} else {
+			$('#bottom>input').val('');
+			$('#addNav>iput').val('');
+			$('#addMenu>input').val('');
+			$('#bottom').hide();
+			$('#opName').text('');
+			alert(a.msg);
+		}
+	})
+}
+
+function del_oath() {
+	if (confirm("确定要删除吗？")) {
+		var oath_id = $('input[name="oath_id"]').val();
+		$.post('/Index/delOath', {
+			oath_id: oath_id
+		}, function(a) {
+			if (a.status == 1) {
+				$.App.alert('success', a.msg);
+				$('#refresh-toggler').click();
+			} else {
+				$.App.alert('danger', a.msg);
+			}
+		})
+	} else {
+		return false;
+	}
+}
+</script>                        
+<script type="text/javascript">
+    $('#AppForm').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+            var tourl="{:url('dlc/Index/authDetail')}";
+            var data=$('#AppForm').serialize();
+            console.log(data);
+            $.post(tourl,data,function(a){
+                if(a.status) {
+                    $.App.alert('success', a.msg);
+                    $('#refresh-toggler').click();
+                } else {
+                    $.App.alert('danger', a.msg);
+                }
+            })
+        },
+    });
+    function roleAdd(){
+        $.ajax({
+            type: "post",
+            url: "{:url('role/roleEdit')}",
+            dataType: "html",
+            height: 500,
+            success: function(mb) {
+                bootbox.dialog({
+                    message: mb,
+                    title: "添加菜单",
+                    className: "modal-darkorange",
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+	
+    function roleEdit(obj){
+        //fbid 查找带回的文本框ID,全局唯一
+        //isall 多图,单图模式
+        //type 0:id  1:相对路径
+        var outh_id = $(obj).val();
+        $.ajax({
+            type: "post",
+            url: "{:url('role/roleEdit')}",
+            data:{"outh_id":outh_id},
+            dataType: "html",
+            height: 500,
+            //beforeSend:$.App.loading(),
+            success: function(mb) {
+                console.log(outh_id),
+                    bootbox.dialog({
+                        message: mb,
+                        title: "编辑菜单",
+                        buttons: {
+                        }
+                    });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+
+    //    function del_oath(){
+    //        if(confirm("确定要删除吗？")) {
+    //            var oath_id = $('#oath_id').val();
+    //            console.log(oath_id);
+    //            $.post('/Admin/User/delOath',{oath_id:oath_id},function(a){
+    //                if(a.status == 1) {
+    //                    $.App.alert('success', a.msg);
+    //                    $('#refresh-toggler').click();
+    //                } else {
+    //                    $.App.alert('danger', a.msg);
+    //                }
+    //            })
+    //        } else {
+    //            return false;
+    //        }
+    //    }
+    function prev2() {
+        var outh_id = $(obj).val();
+        $.ajax({
+            type:"post",
+            url:"{:url('Index/roleList')}",
+            data:{"outh_id":outh_id},
+            dataType: "json",
+            success:function(mb){
+
+                bootbox.dialog({
+                    message: mb,
+                    title: "权限设置",
+                    className: "modal-darkorange",
+                    buttons: {
+                        success: {
+                            success: {
+                                label: "确定",
+                                className: "btn-blue",
+                                callback: function () {
+                                    var dtprice=$('#name1').val();
+                                    var dtadmin=$('#url1').val();
+                                    var dtmsg=$('#order').val();
+                                    if(!dtprice || !dtadmin ){
+                                        alert('请完整填写必添字段!');
+                                        return false;
+                                    }
+                                    var dt=$('#AppForm1').serialize();
+                                    $.ajax({
+                                        type:"post",
+                                        url:"s{:url('dlc/roleList')}",
+                                        data:dt,
+                                        dataType:"json",
+                                        async:false,
+                                        success:function(info){
+                                            if(info['status']){
+                                                $.App.alert('success',info['msg']);
+                                                $('#App-reloader').trigger('click');
+                                            }else{
+                                                $.App.alert('danger',info['msg']);
+                                            }
+                                            return false;
+                                        },
+                                        error:function(xhr){
+                                            $.App.alert('danger','通讯失败！请重试1！');
+                                            return false;
+                                        }
+                                    });
+                                }
+                            },
+                            "取消": {
+                                className: "btn-danger",
+                                callback: function () { }
+                            }
+                        }
+                    }
+                })
+            },
+            error:function(xhr){
+                $.App.alert('danger','通讯失败！请重试！2');
+            }
+        })
+
+    }
+</script>
+<!--/面包屑导航封装-->
+<script type="text/javascript">
+$('#AppForm').bootstrapValidator({
+	submitHandler: function (validator, form, submitButton) {
+      var tourl="{:url('dlc/Index/authDetail')}";
+			var data=$('#AppForm').serialize();
+			$.post(tourl,data,function(a){
+				if(a.status) {
+				  $.App.alert('success', a.msg);
+				  $('#refresh-toggler').click();
+				} else {
+				  $.App.alert('danger', a.msg);
+				}
+				
+			})
+		  },
+	});
+</script>
+<!--/表单验证与提交封装-->

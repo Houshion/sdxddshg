@@ -1,0 +1,119 @@
+<div class="row">
+	<div class="col-xs-12 col-md-12">
+		<div class="widget">
+			<div class="widget-header bg-blue">
+				<i class="widget-icon fa fa-arrow-down"></i>
+				<span class="widget-caption">数据统计</span>
+				<div class="widget-buttons">
+					<a href="#" data-toggle="maximize">
+						<i class="fa fa-expand"></i>
+					</a>
+					<a href="#" data-toggle="collapse">
+						<i class="fa fa-minus"></i>
+					</a>
+					<a href="#" data-toggle="dispose">
+						<i class="fa fa-times"></i>
+					</a>
+				</div>
+			</div>
+			<div class="widget-body">
+            	<form id="AppForm" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+            		{if condition="$type eq 1"}
+		                 <div class="form-group">
+		                      <label class="col-lg-2 control-label">补货员数量：</label>
+		                      <label class="control-label">{$staff} 人</label>
+		                 </div>
+		                 <div class="form-group">
+		                      <label class="col-lg-2 control-label">总销售额：</label>
+		                      <label class="control-label">{$saleMoney}元</label>
+		                 </div>
+		                 <div class="form-group">
+		                      <label class="col-lg-2 control-label">总订单数：</label>
+		                      <label class="control-label">{$saleNumber}单</label>
+		                 </div>
+		                 <div class="form-group">
+		                      <label class="col-lg-2 control-label">销售商品：</label>
+		                      <label class="control-label">{$saleGoods}元</label>
+		                 </div>
+		                 <div class="form-group">
+		                      <label class="col-lg-2 control-label">设备数量：</label>
+		                      <label class="control-label">{$saleDevice}台</label>
+		                 </div>
+	                {else/}
+	                	 <div class="form-group">
+		                      <label class="col-lg-2 control-label">总销售额：</label>
+		                      <label class="control-label">{$saleMoney}元</label>
+		                 </div>
+		                 <div class="form-group">
+		                      <label class="col-lg-2 control-label">总订单数：</label>
+		                      <label class="control-label">{$saleNumber}单</label>
+		                 </div>
+		                 <div class="form-group">
+		                      <label class="col-lg-2 control-label">销售商品：</label>
+		                      <label class="control-label">{$saleGoods}元</label>
+		                 </div>
+		                 <div class="form-group">
+		                      <label class="col-lg-2 control-label">设备数量：</label>
+		                      <label class="control-label">{$saleDevice}台</label>
+		                 </div>
+	                {/if}
+                 </form>
+			</div>
+		</div>
+	</div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+	setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+	//全选
+	var checkall=$('#App-table .App-checkall');
+	var checks=$('#App-table .App-check');
+	var trs=$('#App-table tbody tr');
+	$(checkall).on('click',function(){
+		if($(this).is(":checked")){			
+			$(checks).prop("checked","checked");
+		}else{
+			$(checks).removeAttr("checked");
+		}		
+	});
+	$(trs).on('click',function(){
+		var c=$(this).find("input[type=checkbox]");
+		if($(c).is(":checked")){
+			$(c).removeAttr("checked");
+		}else{
+			$(c).prop("checked","checked");
+		}		
+	});
+	//全删
+	$('#App-delall').on('click',function(){
+		var checks=$(".App-check:checked");
+		var chk='';
+		$(checks).each(function(){
+			chk+=$(this).val()+',';
+		});
+		if(!chk){
+			$.App.alert('danger','请选择要删除的项目！');
+			return false;
+		}
+		var toajax="{:url('Admin/Order/orderDel')}"+"/id/"+chk;
+		var funok=function(){
+			var callok=function(){ 
+				//成功删除后刷新
+				$('#refresh-toggler').trigger('click');
+				return false;
+			};
+			var callerr=function(){
+				//拦截错误
+				return false;
+			};
+			$.App.ajax('post',toajax,'nodata',callok,callerr);
+		}						
+		$.App.confirm("确认要删除吗？",funok);
+	});
+</script>
+<!--/全选特效封装-->

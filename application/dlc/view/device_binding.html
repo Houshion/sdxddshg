@@ -1,0 +1,69 @@
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/Dlc/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/Dlc/ueditor/ueditor.all.min.js"></script>
+<div class="row">
+    <div class="col-xs-12 col-xs-12">
+        <div class="widget radius-bordered">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">绑定员工</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <form id="AppForm" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+                      data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                    <div class="form-title">
+                        <a href="{:url('Dlc/device/index',array('p'=>$page))}" class="btn btn-primary" data-loader="App-loader" data-loadername="设备列表">
+                            <i class="fa fa-mail-reply"></i>返回
+                        </a>
+                    </div>
+                    <input type="hidden" name="shop_id" value="{$shop_id}">
+                    <input type="hidden" name="page" value="{$page}">
+                    <input type="hidden" name="device_id" value="{$device_id}">
+                     <div class="form-group">
+                        <label class="col-lg-2 control-label">员工名称<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <select name="user_id" id="shop_id" data-bv-notempty="true" data-bv-notempty-message="不能为空">
+                                <option value="">请选择</option>
+                                {volist name="result" id='vo'}
+                                     <option value="{$vo.user_id}">{$vo.username}</option>
+                                {/volist}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-offset-2 col-lg-4">
+                            <button class="btn btn-primary btn-lg" type="submit">保存</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--表单验证与提交封装-->
+<script type="text/javascript">
+    $('#AppForm').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+            var tourl = "{:url('Dlc/device/binding')}";
+            var data = $('#AppForm').serialize();
+            $.App.ajax('post', tourl, data, null);
+            return false;
+     }});
+</script>
+<!--/表单验证与提交封装-->

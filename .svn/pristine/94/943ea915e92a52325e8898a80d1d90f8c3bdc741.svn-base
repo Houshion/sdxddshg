@@ -1,0 +1,188 @@
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">收入列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="widget-body">
+                <div class="table-toolbar">
+                    <!--<button  class="btn btn-warning" data-loader="App-loader" data-loadername="导出数据" onclick="exportExcel()">导出数据</button>-->
+
+                    <!--<a href="#" class="btn btn-danger" id="App-delall">-->
+                    <!--<i class="fa fa-delicious"></i>全部删除-->
+                    <!--</a>-->
+
+                    <div class="pull-right" style="padding-bottom: 10px">
+                        <form id="App-search">
+
+                            <!--用户昵称：<label style="margin-bottom: 0px;">-->
+                            <!--<input name="nickname" type="search" class="form-control input-sm" value="{$nickname}" placeholder="用户昵称">-->
+                            <!--</label>  &nbsp;&nbsp;-->
+
+                            <!--用户手机号：<label style="margin-bottom: 0px;">-->
+                            <!--<input name="mobile" type="search" class="form-control input-sm" value="{$mobile}" placeholder="用户手机号">-->
+                            <!--</label>  &nbsp;&nbsp;-->
+
+                           <!-- 提现状态：<label style="margin-bottom: 0px;">
+                            <select name="status" class="form-control select-sm">
+                                <option value="">请选择</option>
+                                {volist name="statusArr" id="vo"}
+                                <option value="{$key}" {$key==$status?'selected':''}>{$vo}</option>
+                                {/volist}
+                            </select>
+                            &lt;!&ndash;<input name="title" type="search" class="form-control input-sm" value="" placeholder="用户类型">&ndash;&gt;
+                        </label> &nbsp;&nbsp;
+
+                            <a href="{:url('/shop/withdraw/index/')}" class="btn btn-success" data-loader="App-loader"
+                               data-loadername="" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>-->
+                        </form>
+                    </div>
+                </div>
+
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                    <tr role="row">
+                        <!--<th width="30px"><div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                        <!--<label style=" padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">-->
+                        <!--<span class="text"></span>-->
+                        <!--</label>-->
+                        <!--</div></th>-->
+                        <th>ID</th>
+                        <th>收入</th>
+                        <th>已提现金额</th>
+                        <th>现在提现金额</th>
+                        <!--    <th>操作</th>-->
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {volist name="list" id="vo"}
+                    <tr>
+                        <!--<td>-->
+                        <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                        <!--<label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="">-->
+                        <!--<span class="text"></span>-->
+                        <!--</label>-->
+                        <!--</div>-->
+                        <!--</td>-->
+                        <td>{$vo['id']}</td>
+                        <td>{$vo['money']}元</td>
+                        <td>{$vo['withdraw_money']}</td>
+                        <td>{$vo['pend_money']}</td>
+
+                        <!--<td>
+                            {if condition="$vo['status'] eq 1"}
+                            <a href="{:url('/shop/withdraw/edit',['withdraw_id'=>2])}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="审核通过">审核通过</a>
+                            {elseif condition="$vo['status'] eq 2"/}
+                            <button type="button" class="btn btn-error btn-xs"> 已完成 </button>
+                            {/if}
+                        </td>-->
+                        <!--<td>-->
+                        <!--<a href="{:url('/Dlc/goods/edit')}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="编辑"><i class="fa fa-edit"></i> 详情</a> &nbsp;-->
+                        <!--</td>-->
+                    </tr>
+                    {/volist}
+                    </tbody>
+                </table>
+             <!--   <div class="row DTTTFooter">
+                    {$page}
+                </div>-->
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall = $('#App-table .App-checkall');
+    var checks = $('#App-table .App-check');
+    var trs = $('#App-table tbody tr');
+    $(checkall).on('click', function () {
+        if ($(this).is(":checked")) {
+            $(checks).prop("checked", "checked");
+        } else {
+            $(checks).removeAttr("checked");
+        }
+    });
+    $(trs).on('click', function () {
+        var c = $(this).find("input[type=checkbox]");
+        if ($(c).is(":checked")) {
+            $(c).removeAttr("checked");
+        } else {
+            $(c).prop("checked", "checked");
+        }
+    });
+    //全删
+    $('#App-delall').on('click', function () {
+        var checks = $(".App-check:checked");
+        var chk = '';
+        $(checks).each(function () {
+            chk += $(this).val() + ',';
+        });
+        if (!chk) {
+            $.App.alert('danger', '请选择要删除的项目！');
+            return false;
+        }
+        var toajax = '/Dlc/goods/clear?goods_id=' + chk;
+        var funok = function () {
+            var callok = function () {
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr = function () {
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post', toajax, 'nodata', callok, callerr);
+        }
+        $.App.confirm("确认要删除吗？", funok);
+    });
+
+    //导出数据
+    function exportExcel() {
+        $.ajax({
+            type: "post",
+            url: "{:url('dlc/recharge/exportSelect')}",
+            //data:{"outh_id":outh_id},
+            dataType: "html",
+            height: 500,
+            success: function (mb) {
+                //console.log(mb),
+                bootbox.dialog({
+                    message: mb,
+                    title: "导出筛选",
+                    buttons: {}
+                });
+            },
+            error: function (xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+
+</script>
+<!--/全选特效封装-->

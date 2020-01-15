@@ -1,0 +1,113 @@
+<div class="row">
+    <div class="col-xs-12 col-xs-12">
+        <div class="widget radius-bordered">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">版本设置</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <form id="AppForm" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                    <input type="hidden" name="version_id" value="{$cache.version_id}">
+                    <input type="hidden" name="type" value="5">
+                    <div class="form-title">
+                        <a href="{:url('Dlc/System/index',array('type'=>1))}"  class="btn {if condition="$Request.param.type==1"}btn-info{/if}" data-loader="App-loader" data-loadername="系统设置">
+                            <i></i>基本设置
+                        </a>
+                        <a href="{:url('Dlc/System/index',array('type'=>2))}" class="btn {if condition="$Request.param.type==2"}btn-info{/if}" data-loader="App-loader" data-loadername="短信设置">
+                            <i></i>短信设置
+                        </a>
+                        <a href="{:url('Dlc/System/index',array('type'=>3))}" class="btn {if condition="$Request.param.type==3"}btn-info{/if}" data-loader="App-loader" data-loadername="微信设置">
+                            <i></i>微信设置
+                        </a>
+                        <a href="{:url('Dlc/System/index',array('type'=>5))}" class="btn {if condition="$Request.param.type==5"}btn-info{/if}" data-loader="App-loader" data-loadername="版本设置">
+                            <i></i>版本设置
+                        </a>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">版本号 :</label>
+                        <div class="col-lg-4">
+                            <input class="form-control" name="version_number" rows="5" value="{$cache.version_number}"  placeholder="必填" required data-bv-notempty-message="不能为空">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">下载地址</label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control" name="url" placeholder="必填"  data-bv-notempty-message="不能为空" value="{$cache.url}">
+                        </div>
+                        <div class="wu-example uploader" >
+                            <!--用来存放文件信息-->
+                            <div class="uploader-list"></div>
+                            <div class="btns">
+                                <div id="url" class="picker">选择文件</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-offset-2 col-lg-4">
+                            <button class="btn btn-info btn-lg" type="submit" >保存</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--表单验证与提交封装-->
+<script type="text/javascript">
+$('#AppForm').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+            var tourl = "{:url('Dlc/system/version_set')}";
+            var data = $('#AppForm').serialize();
+            $.App.ajax('post', tourl, data, null);
+            return false;
+}});
+$(".picker").each(function(){
+    var upid = $(this).attr('id');
+    var uploader = WebUploader.create({
+
+        auto: true,
+        // swf文件路径
+        swf: '/public/static/webuploader/Uploader.swf',
+
+        // 文件接收服务端。
+        server: '/dlc/upload/bin',
+
+        // 选择文件的按钮。可选。
+        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+        pick: '#' + upid,
+
+        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+        resize: false,
+    });
+
+    uploader.on('uploadSuccess', function (file,data) {
+        console.log(upid);
+        if(data.code == 1) {
+            $.App.alert('danger', '上传成功！');
+            $('input[name="'+upid+'"').val(data.data);
+        } else {
+            layer.msg(data.msg);
+        }
+    });
+})
+
+</script>
+<!--/表单验证与提交封装-->

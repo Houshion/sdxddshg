@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Head -->
+<head>
+    <meta charset="utf-8" />
+    <title>{$auth.name}</title>
+    <meta name="description" content="blank page" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="{$Think.config.dlcimg}favicon.png" type="image/x-icon"> 
+    <!--Basic Styles-->
+    <link href="{$Think.config.dlccss}bootstrap.min.css" rel="stylesheet" />
+    <link href="{$Think.config.dlccss}font-awesome.min.css" rel="stylesheet" />
+    <link href="{$Think.config.dlccss}weather-icons.min.css" rel="stylesheet" />
+    <!--Beyond styles-->
+    <link id="beyond-link" href="{$Think.config.dlccss}beyond.min.css" rel="stylesheet" />
+    <link href="{$Think.config.dlccss}demo.min.css" rel="stylesheet" />
+    <link href="{$Think.config.dlccss}typicons.min.css" rel="stylesheet" />
+    <link href="{$Think.config.dlccss}animate.min.css" rel="stylesheet" />
+    <link href="{$Think.config.dlccss}appcms.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{$Think.config.dlccss}bootstrap-datetimepicker.min.css">
+
+    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
+    <!--<script src="__PUBLIC__/Dlc/js/skins.min.js"></script>-->
+    <style>
+        .upimgwell {
+            margin-bottom: 0px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .FL {
+            float: left;
+        }
+
+        .FR {
+            float: right;
+        }
+		.DTTTFooter{min-height:24px;}
+    </style>
+</head>
+<!-- /Head -->
+<!-- Body -->
+<body>
+<!-- Loading Container -->
+<div class="loading-container" id="App-loading-wrap">
+    <div id="loading" style="top: 150px; display: block;"><div class="lbk"></div><div class="lcont"><img src="{$Think.config.dlcimg}loading.gif" alt="loading...">正在加载...</div></div>
+</div>
+<!--  /Loading Container -->
+<!-- Navbar -->
+<div class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-container">
+            <!-- Navbar Barnd -->
+            <div class="navbar-header pull-left" style="text-align:center;margin-left: 10px; padding-top: 10px;">
+                <a href="javascript:void(0)" class="navbar-brand">
+                    <small>
+                        {$auth.name}
+                    </small>
+                </a>
+            </div>
+            <!-- /Navbar Barnd -->
+            <!-- Sidebar Collapse -->
+            <div class="sidebar-collapse" id="sidebar-collapse">
+                <i class="collapse-icon fa fa-bars"></i>
+            </div>
+            <!-- /Sidebar Collapse -->
+            <!-- Account Area and Settings -->
+            <div class="navbar-header pull-right">
+                <div class="navbar-account">
+                    <ul class="account-area">
+                        <li>
+                            <a class="login-area dropdown-toggle" data-toggle="dropdown">
+                                <section>
+                                    <h2><span class="profile"><span>{$Think.session.CMS.user.nickname}</span></span></h2>
+                                </section>
+                            </a>
+                            <!--Login Area Dropdown-->
+                            <ul class="pull-right dropdown-menu dropdown-arrow dropdown-login-area">
+                                <li class="username">
+                                    <a>{$Think.session.CMS.user.nickname}</a>
+                                </li>
+                                <!--/Theme Selector Area-->
+                                <li class="dropdown-footer">
+                                    <a href="{:url('Dlc/Public/logout')}">
+                                        注销登录
+                                    </a>
+                                </li>
+                                <li class="dropdown-footer">
+                                    <a href="{:url('Dlc/Index/modifypass')}"  data-loader="App-loader" data-loadername="修改密码">
+                                        修改密码
+                                    </a>
+                                </li>
+                            </ul>
+                            <!--/Login Area Dropdown-->
+                        </li>
+                        <!-- /Account Area -->
+                        <!--Note: notice that setting div must start right after account area list.
+                        no space must be between these elements-->
+                        <!-- Settings -->
+                    </ul>
+                    <!-- Settings -->
+                </div>
+            </div>
+            <!-- /Account Area and Settings -->
+        </div>
+    </div>
+</div>
+<!-- /Navbar -->
+<!-- Main Container -->
+<div class="main-container container-fluid">
+    <!-- Page Container -->
+    <div class="page-container">
+        <!-- Page Sidebar -->
+        <div class="page-sidebar" id="sidebar">
+            <!-- Sidebar Menu -->
+            <ul class="nav sidebar-menu" style="margin-top: 1px;">
+                    <li>
+                     	<a href="{:url('Dlc/Index/main')}" data-loader="App-loader" data-loadername="系统主页" id="AppHome">
+                        <i class="menu-icon glyphicon glyphicon-home"></i> <span class="menu-text">系统主页</span>
+                        </a>
+                    </li>
+                    {volist name="role_oath1" id="vo"}
+                        <li>
+                            <a href="#" class="menu-dropdown">
+                                <i class="menu-icon glyphicon glyphicon-{$vo.icon}"></i>
+                                <span class="menu-text">{$vo.name}</span>
+                                <i class="menu-expand"></i>
+                            </a>
+                            <ul class="submenu">
+                                {volist name="role_oath2" id="bo"}
+                                    {eq name="bo['parent_id']" value="$vo['oath_id']"}
+                                        <li>
+                                            <a href="{$bo['url']}" data-loader="App-loader" data-loadername="{$bo.name}">
+                                                <span class="menu-text">{$bo.name}</span>
+                                            </a>
+                                        </li>
+                                    {/eq}
+                                {/volist}
+                            </ul>
+                        </li>
+                    {/volist}
+                    <!-- modify by xialiang end -->
+            </ul>
+            <!-- /Sidebar Menu -->
+        </div>
+        <!-- /Page Sidebar -->
+        <!-- Page Content -->
+        <div class="page-content">
+            <!-- Page Breadcrumb -->
+            <div class="page-breadcrumbs">
+                <ul class="breadcrumb" id="App-bread">
+                    <li>
+                    	<i class="fa fa-home"></i>
+                        <a href="{:url('Dlc/Index/main')}" data-loader="App-loader" data-loadername="主页">主页</a>
+                    </li>
+                    <li class="active">系统主页</li>
+                </ul>
+            </div>
+            <!-- /Page Breadcrumb -->
+            <!-- Page Header -->
+            <div class="page-header position-relative">
+                <div class="header-title">
+                    <h1 id="App-loader-title">
+                        系统主页
+                    </h1>
+                </div>
+                <!--Header Buttons-->
+                <div class="header-buttons">
+                    <a class="sidebar-toggler" href="#">
+                        <i class="fa fa-arrows-h"></i>
+                    </a>
+                    <a class="refresh" id="refresh-toggler" href="{:url('Dlc/Index/main')}" data-loader="App-loader" data-name="系统主页">
+                        <i class="glyphicon glyphicon-refresh"></i>
+                    </a>
+                    <a class="history" id="history-toggler" href="{:url('Dlc/Index/main')}" data-historyback="App-historyback" data-loader="App-loader" data-name="系统主页">
+                        <i class="glyphicon glyphicon-arrow-left"></i>
+                    </a>
+                    <a class="fullscreen" id="fullscreen-toggler" href="#">
+                        <i class="glyphicon glyphicon-fullscreen"></i>
+                    </a>
+                </div>
+                <!--Header Buttons End-->
+            </div>
+            <!-- /Page Header -->
+            <!-- Page Body -->
+            <div id="App-loader" class="page-body">
+                <!-- 主加载器 -->
+            </div>
+            <!--图片库-->
+            <!-- /Page Body -->
+        </div>
+        <!-- /Page Content -->
+    </div>
+    <!-- /Page Container -->
+    <!-- Main Container -->
+</div>
+<!--全局隐藏控件-->
+<div class="hide">
+    <!--AppReloader-->
+    <a id="App-reloader" href="#">JOELRELOADER</a>
+    <!--单图片上传控件-->
+    <iframe style="display:none" name='doupimg_frame' id="doupimg_frame"></iframe>
+    <form enctype="multipart/form-data" action="{:url('Dlc/Upload/doupimg')}" method="post" id="App-form-upimg" target="doupimg_frame">
+        <input type="file" id="jupimg" name="jupimg" accept="image/*">
+    </form>
+</div>
+	<!--基础脚本-->
+    <script src="{$Think.config.dlcjs}jquery-2.0.3.min.js"></script>
+    <script src="{$Think.config.dlcjs}bootstrap.min.js"></script>
+    <script src="{$Think.config.dlcjs}beyond.min.js"></script>
+    <script src="{$Think.config.dlcjs}toastr/toastr.js"></script>
+    <script src="{$Think.config.dlcjs}validation/bootstrapValidator.js"></script>
+    <script src="{$Think.config.dlcjs}bootbox/bootbox.js"></script>
+    <!--日期时间-->
+    <script src="{$Think.config.dlcjs}datetime/bootstrap-datetimepicker.min.js"></script>
+    <script src="{$Think.config.dlcjs}datetime/bootstrap-datetimepicker.zh-CN.js"></script>
+    <!--统计脚本-->
+    <script src="{$Think.config.dlcjs}charts/easypiechart/jquery.easypiechart.js"></script>
+    <script src="{$Think.config.dlcjs}charts/easypiechart/easypiechart-init.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.orderBars.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.tooltip.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.resize.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.selection.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.crosshair.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.stack.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.time.js"></script>
+    <script src="{$Think.config.dlcjs}charts/flot/jquery.flot.pie.js"></script>
+    <script src="{$Think.config.dlcjs}charts/chartjs/Chart.js"></script>  
+    <script src="{$Think.config.dlcjs}echarts.js"></script>
+<!--引入CSS-->
+<link rel="stylesheet" type="text/css" href="/public/static/webuploader/webuploader.css">
+<!--引入JS-->
+<script type="text/javascript" src="/public/static/webuploader/webuploader.js"></script>
+
+<!-- 编辑器 -->
+	<script type="text/javascript" charset="utf-8" src="{$Think.config.dlcjs}ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="{$Think.config.dlcjs}ueditor/ueditor.all.min.js"></script>
+    <!--百度地图类库-->
+    <script type="text/javascript"  src="http://api.map.baidu.com/api?v=2.0&ak=gk88uOKbmZEuMGEgEFkEvKGz"></script>
+    <!--App全局API-->
+    <script src="{$Think.config.dlcjs}appapi.js"></script>
+<script type="text/javascript">
+    var RootPath = "__ROOT__";
+    var AppLoaderTitle = $('#App-loader-title');
+    var AppLoaderRefresh = $('#refresh-toggler');
+    var AppLoaderHistory = $('#history-toggler');
+    var AppLoaderReloader = $('#App-reloader');
+    var AppSbLi = $('.sidebar-menu li');
+    //主导航高亮
+    var AppSideli = $('.submenu li');
+    //公共设置HTML内容方法
+    function setHtml(id, html) {
+        $(id).html(html);
+    }
+
+    var Historys = [];
+    var Historys_name = [];
+
+    //初始化主框架加载后的操作
+    function initFrame() {
+        var AppLoaderTitle = $('#App-loader-title');
+        var AppLoaderRefresh = $('#refresh-toggler');
+        var AppLoaderHistory = $('#history-toggler');
+        var AppLoaderReloader = $('#App-reloader');
+        //处理Frame加载后的所有链接
+        var links = $('a');
+        $(links).on('click', function() {
+
+            //$(AppSideli).removeClass('active');
+            var loader = $(this).data('loader');
+            var tourl = $(this).attr('href');
+            var name = $(this).data('loadername');
+            var historyback = $(this).data('historyback');
+            $(AppLoaderReloader).attr('href', tourl).data('loader', loader).data('loadername', name);
+            if (loader) {
+                //高亮主导航
+                var li = $(this).parent('li');
+                //$(li).siblings().removeClass('active');
+                $(AppSbLi).removeClass('active');
+                $(li).addClass('active');
+                //如果是主Loader
+                if (loader == 'App-loader') {
+                    if(historyback == 'App-historyback'){
+                        var len = Historys.length;
+                        if(len > 0){
+                            Historys.splice(len - 1, 1);
+                            Historys_name.splice(len - 1, 1);
+                            len --;
+                        }
+                        if(len > 0){
+                            tourl = Historys[len - 1];
+                            name = Historys_name[len - 1];
+                        }
+                    }else{
+                        //var len = Historys.length;
+                        //if(len > 0 && tourl != Historys[len - 1]){
+                        Historys.push(tourl);
+                        Historys_name.push(name);
+                        //}else if(len == 0){
+                        //  Historys.push(tourl);
+                        //  Historys_name.push(name);
+                        //}
+                    }
+                    setHtml(AppLoaderTitle, name);
+                    $(AppLoaderRefresh).attr('href', tourl).data('loader', 'App-loader').data('loadername', name);
+                    //$(AppLoaderHistory).attr('href', Historys.length > 0 ? tourl : "{:url('Dlc/Index/main')}").data('loader', 'App-loader').data('loadername', name);
+                }
+                $('#' + loader).empty().load(tourl, function() {
+                    initLoader(loader);
+                });
+                return false;
+            }
+        });
+    }
+    //初始化Loader加载后的操作
+    function initLoader(loader) {
+        //加载Widget特效
+        InitiateWidgets();
+        //处理Loader加载后的所有链接
+        var loaderlinks = $('#' + loader + ' a');
+        $(loaderlinks).on('click', function() {
+            var loader = $(this).data('loader');
+            var tourl = $(this).attr('href');
+            var search = $(this).data('search');
+            var name = $(this).data('loadername');
+            //特殊按钮特效--全部阻止
+            var type = $(this).data('type');
+
+            if (type) {
+                switch (type) {
+                    case 'del':
+                        var content = $(this).data('content');
+                        if (!content) content = "确定要删除吗？";
+                        var toajax = $(this).data('ajax');
+                        var funok = function() {
+                            var callok = function() {
+                                //成功删除后刷新
+                                $(AppLoaderReloader).trigger('click');
+                                return false;
+                            };
+                            var callerr = function() {
+                                //拦截错误
+                                return false;
+                            };
+                            $.App.ajax('post', toajax, 'nodata', callok, callerr);
+                        }
+                        $.App.confirm(content, funok);
+                        return false;
+                        //
+                        break;
+                    case 'dispose':
+                        var content = $(this).data('content');
+                        if (!content) content = "确定要处理吗？";
+                        var toajax = $(this).data('ajax');
+                        var funok = function() {
+                            var callok = function() {
+                                //成功删除后刷新
+                                $(AppLoaderReloader).trigger('click');
+                                return false;
+                            };
+                            var callerr = function() {
+                                //拦截错误
+                                return false;
+                            };
+                            $.App.ajax('post', toajax, 'nodata', callok, callerr);
+                        }
+                        $.App.confirm(content, funok);
+                        return false;
+                        //
+                        break;
+                    case 'jiebang':
+                            var content = $(this).data('content');
+                            if (!content) content = "确定要解绑吗？";
+                            var toajax = $(this).data('ajax');
+                            var funok = function() {
+                                var callok = function() {
+                                    //成功删除后刷新
+                                    $(AppLoaderReloader).trigger('click');
+                                    return false;
+                                };
+                                var callerr = function() {
+                                    //拦截错误
+                                    return false;
+                                };
+                                $.App.ajax('post', toajax, 'nodata', callok, callerr);
+                            }
+                            $.App.confirm(content, funok);
+                            return false;
+                    case 'confirm':
+                        var content = $(this).data('content');
+                        if (!content) content = "确定要更改吗？";
+                        var toajax = $(this).data('ajax');
+                        var funok = function() {
+                            var callok = function() {
+                                //成功删除后刷新
+                                $(AppLoaderReloader).trigger('click');
+                                return false;
+                            };
+                            var callerr = function() {
+                                //拦截错误
+                                return false;
+                            };
+                            $.App.ajax('post', toajax, 'nodata', callok, callerr);
+                        }
+                        $.App.confirm(content, funok);
+                        return false;
+                        //
+                        break;
+                    case 'filediv':
+                        break;
+                    default:
+                        $.App.alert('danger', '此Type属性系统未定义！');
+                        break;
+                }
+
+            } else {
+                //不存在特殊效果时，绑定Reloader刷新地址
+                $(AppLoaderReloader).attr('href', tourl).data('loader', loader).data('loadername', name).data('search', search);
+            }
+
+            if (loader) {
+                //如果是主Loader
+                if (loader == 'App-loader') {
+                    Historys.push(tourl);
+                    Historys_name.push(name);
+                    setHtml(AppLoaderTitle, name);
+                    $(AppLoaderRefresh).attr('href', tourl).data('loader', 'App-loader').data('loadername', name);
+                }
+                //如果有搜索条件绑定
+                if (search) {
+                    var sv = $('#' + search).serialize();
+                    if (sv) {
+                        tourl = tourl + '?' + sv;
+                    }
+                }
+                $('#' + loader).empty().load(tourl, function() {
+                    initLoader(loader);
+                });
+                return false;
+            }
+        });
+
+    }
+    //公共设置面包屑导航
+    function setBread(html) {
+        $('#App-bread').empty().html(html);
+        $('#App-bread a').on('click', function() {
+            var loader = $(this).data('loader');
+            var name = $(this).data('loadername');
+            var tourl = $(this).attr('href');
+            Historys.push(tourl);
+            Historys_name.push(name);
+            setHtml(AppLoaderTitle, name);
+            $(AppLoaderRefresh).attr('href', tourl).data('loader', 'App-loader').data('loadername', name);
+            $('#' + loader).empty().load(tourl, function() {
+                initLoader(loader);
+            });
+            return false;
+        });
+    }
+
+    //App默认图片上传管理器
+    function appImguploader_one(fbid, isall,issrc) {
+        //fbid 查找带回的文本框ID,全局唯一
+        //isall 多图,单图模式
+        $.ajax({
+            type: "post",
+            url: "{:url('Dlc/Upload/indeximg')}",
+            data: {
+                'fbid': fbid,
+                'isall': isall,
+                'issrc': issrc || 0
+            },
+            dataType: "json",
+            //beforeSend:$.App.loading(),
+            success: function(mb) {
+                // console.log(mb);
+                //$.App.loading();
+                bootbox.dialog({
+                    message: mb,
+                    title: "图片上传管理器",
+                    className: "modal-darkorange",
+                    buttons: {
+
+                        "确定": {
+                            className: "btn-blue",
+                            callback: function() {
+                                $('#' + fbid).val($('#App-uploader-findback').val());
+                            }
+                        },
+                        "取消": {
+                            className: "btn-danger",
+                            callback: function() {}
+                        }
+                    }
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+    function appImguploader(fbid, isall,issrc) {
+        //fbid 查找带回的文本框ID,全局唯一
+        //isall 多图,单图模式
+        $.ajax({
+            type: "post",
+            url: "{:url('Dlc/Upload/indeximg')}",
+            data: {
+                'fbid': fbid,
+                'isall': isall,
+                'issrc': issrc || 0
+            },
+            dataType: "json",
+            //beforeSend:$.App.loading(),
+            success: function(mb) {
+                //$.App.loading();
+                bootbox.dialog({
+                    message: mb,
+                    title: "图片上传管理器",
+                    className: "modal-darkorange",
+                    buttons: {
+                        "追加": {
+                            className: "btn-success",
+                            callback: function() {
+                                if (isall == 'false') {
+                                    $('#' + fbid).val($('#App-uploader-findback').val());
+                                } else {
+                                    var aaa = $('#' + fbid).val();
+                                    if(!aaa) {
+                                        $('#' + fbid).val($('#App-uploader-findback').val());
+                                    } else {
+                                        $('#' + fbid).val($('#' + fbid).val() + ',' + $('#App-uploader-findback').val());
+                                    }
+                                }
+                            }
+                        },
+                        "替换": {
+                            className: "btn-blue",
+                            callback: function() {
+                                $('#' + fbid).val($('#App-uploader-findback').val());
+                            }
+                        },
+                        "取消": {
+                            className: "btn-danger",
+                            callback: function() {}
+                        }
+                    }
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+    //App默认图片预览器
+    function appImgviewer(fbid,type) {
+        //fbid 查找带回的文本框ID,全局唯一
+        //isall 多图,单图模式
+        var ids = $('#' + fbid).val();
+        if (!ids) {
+            $.App.alert('danger', '您还没有图片可以预览！');
+            return false;
+        }
+        $.ajax({
+            type: "post",
+            url: "{:url('Dlc/Index/appImgviewer')}",
+            data: {
+                'ids': ids,
+                'type':type || 0
+            },
+            dataType: "json",
+            success: function(mb) {
+                bootbox.dialog({
+                    message: mb,
+                    title: "图片预览器",
+                    className: "modal-darkorange",
+                    buttons: {
+                        success: {
+                            label: "确定",
+                            className: "btn-blue",
+                            callback: function() {}
+                        },
+                        "取消": {
+                            className: "btn-danger",
+                            callback: function() {}
+                        }
+                    }
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+    //App默认图片预览器
+    function appImgviewer1(fbid,type) {
+        //fbid 查找带回的文本框ID,全局唯一
+        //isall 多图,单图模式
+        var ids = $('#' + fbid).val();
+        if (!ids) {
+            $.App.alert('danger', '您还没有图片可以预览！');
+            return false;
+        }
+        if(!type) {
+            type = 'id';
+        }
+        $.ajax({
+            type: "post",
+            url: "{:url('Dlc/Index/appImgviewer1')}",
+            data: {
+                'ids': ids,
+                'type':type
+            },
+            dataType: "json",
+            success: function(mb) {
+                bootbox.dialog({
+                    message: mb,
+                    title: "图片预览器",
+                    className: "modal-darkorange",
+                    buttons: {
+                        success: {
+                            label: "确定",
+                            className: "btn-blue",
+                            callback: function() {}
+                        },
+                        "取消": {
+                            className: "btn-danger",
+                            callback: function() {}
+                        }
+                    }
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+    //App默认百度地图控件
+    function baiduDitu(fbaddid, fblngid, fblatid) {
+        var fbadd = $('#' + fbaddid);
+        var fblng = $('#' + fblngid);
+        var fblat = $('#' + fblatid);
+        // alert(fbadd);
+        // alert(fblng);
+        // alert(fblat);
+        // console.log(789);
+
+        if (!fbadd || !fblng || !fblat) {
+            $.App.alert('danger', '回调控件不完整!');
+        }
+        //fbid 查找带回的文本框ID,全局唯一
+        $.ajax({
+            type: "post",
+            url: "{:url('/Dlc/Public/baiduDitu')}",
+            data: {
+                'address': $(fbadd).val(),
+                'lng': $(fblng).val(),
+                'lat': $(fblat).val()
+            },
+            dataType: "json",
+            success: function(mb) {
+                bootbox.dialog({
+                    message: mb,
+                    title: "百度地图控件",
+                    className: "modal-darkorange",
+                    buttons: {
+                        success: {
+                            label: "确定",
+                            className: "btn-blue",
+                            callback: function() {
+                                $(fbadd).val($('#baiduDituaddress').val());
+                                $(fblng).val($('#baiduDitulng').val());
+                                $(fblat).val($('#baiduDitulat').val());
+                            }
+                        },
+                        "取消": {
+                            className: "btn-danger",
+                            callback: function() {}
+                        }
+                    }
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+    //App默认SKU管理器
+    function appSkuloader(ids, fbid, goodsid) {
+        //ids  已选择的属性
+        //fbid 查找带回的文本框ID,全局唯一
+        $.ajax({
+            type: "post",
+            url: "{:url('Dlc/Shop/skuLoader')}",
+            data: {
+                'ids': ids,
+                'fbid': fbid,
+                'goodsid': goodsid
+            },
+            dataType: "json",
+            //beforeSend:$.App.loading(),
+            success: function(mb) {
+                //$.App.loading();
+                bootbox.dialog({
+                    message: mb,
+                    title: "商品Sku管理器",
+                    className: "modal-darkorange",
+                    buttons: {
+                        "取消": {
+                            className: "btn-danger",
+                            callback: function() {}
+                        }
+                    }
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+    $(document).ready(function() {
+        initFrame();
+        //初始化图表
+        //InitiateEasyPieChart.init();
+        $('#AppHome').trigger('click');
+
+    });
+    function preview(img) {
+        if (!img) {
+            $.App.alert('danger', '您还没有图片可以预览！');
+            return false;
+        }
+        var mb = "<div style='text-align:center;width:570px;overflow:hidden;'>" +
+            "<img src='"+img+"' width='100%'/>" +
+            "<br><br></div>";
+        bootbox.dialog({
+            message: mb,
+            title: "图片预览器",
+            className: "modal-darkorange",
+            buttons: {
+                success: {
+                    label: "确定",
+                    className: "btn-blue",
+                },
+                "取消": {
+                    className: "btn-danger",
+                }
+            }
+        });
+        return false;
+    }
+    $(document).ready(function() {
+        //initFrame();
+        //初始化图表
+        //InitiateEasyPieChart.init();
+        $('#AppHome').trigger('click');
+    });
+</script>
+</body>
+<!--  /Body -->
+
+</html>

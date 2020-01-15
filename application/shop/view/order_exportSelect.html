@@ -1,0 +1,134 @@
+<link rel="stylesheet" href="{$Think.config.dlccss}datepicker.css" />
+<script src="{$Think.config.dlcjs}bootstrap-datepicker.min.js"></script>
+<script src='{$Think.config.dlcjs}highcharts.js'></script>
+<style>
+    .modal-content{height:420px;}
+</style>
+<div class="col-lg-12" style="margin-left: 10px;width: 510px; height: auto; margin-top:20px;" id="">
+    <form id="AppForm2" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+
+        <div class="form-group">
+            <label class="col-lg-3 control-label">设备编号 :<sup>*</sup></label>
+            <div class="col-lg-9">
+                <input type="text" name="macno" class="form-control input-sm" placeholder="设备编号">
+            </div>
+        </div>
+
+
+
+        <div class="form-group">
+            <label class="col-lg-3 control-label">用户昵称 :<sup>*</sup></label>
+            <div class="col-lg-9">
+                <input name="username" type="text" class="form-control input-sm" placeholder="用户昵称">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-lg-3 control-label">订单状态 :<sup>*</sup></label>
+            <div class="col-lg-9">
+                <select name='status' class="form-control input-sm">
+                    <option value="">请选择</option>
+                    <option value="2"{if condition="$status eq '2'"} selected{/if}>未付款</option>
+                    <option value="3"{if condition="$status eq '3'"} selected{/if}>已支付</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-lg-3 control-label">支付方式 :<sup>*</sup></label>
+            <div class="col-lg-9">
+                <select name='pay_type' class="form-control input-sm">
+                    <option value="">请选择</option>
+                    <option value="1"{if condition="$pay_type eq '2'"} selected{/if}>微信</option>
+                    <option value="2"{if condition="$pay_type eq '2'"} selected{/if}>支付宝</option>
+                    <option value="3"{if condition="$pay_type eq '3'"} selected{/if}>余额</option>
+                </select>
+            </div>
+        </div>
+
+
+        <!--订单状态:-->
+        <!--<label style="margin-bottom: 0px;">-->
+            <!--<select name='status'>-->
+                <!--<option value="">请选择</option>-->
+                <!--<option value="2"{if condition="$status eq '2'"} selected{/if}>未付款</option>-->
+                <!--<option value="3"{if condition="$status eq '3'"} selected{/if}>已支付</option>-->
+            <!--</select>-->
+        <!--</label>  &nbsp;&nbsp;-->
+
+
+        <!--支付方式:-->
+        <!--<label style="margin-bottom: 0px;">-->
+            <!--<select name='pay_type'>-->
+                <!--<option value="">请选择</option>-->
+                <!--<option value="1"{if condition="$pay_type eq '2'"} selected{/if}>微信</option>-->
+                <!--<option value="2"{if condition="$pay_type eq '2'"} selected{/if}>支付宝</option>-->
+                <!--<option value="3"{if condition="$pay_type eq '3'"} selected{/if}>余额</option>-->
+            <!--</select>-->
+        <!--</label>  &nbsp;&nbsp;-->
+
+
+        <!--<div class="form-group">-->
+            <!--<label class="col-lg-3 control-label">帐号类型 :<sup>*</sup></label>-->
+            <!--<div class="col-lg-9">-->
+                <!--<select name="user_type" id="status" class="form-control">-->
+                    <!--<option value="0">所有类型</option>-->
+                    <!--<option value="1">小程序</option>-->
+                    <!--<option value="2">生活号</option>-->
+                <!--</select>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="form-group">-->
+            <!--<label class="col-lg-3 control-label">关注时间 :<sup>*</sup></label>-->
+            <!--<div class="col-lg-9">-->
+                <!--<input readonly="readonly" class="form-control search-query date-picker" style="width:155px;float:left;" name="start" value="0" placeholder="开始时间" type="text">-->
+                <!--<span style="float:left; line-height:32px;">&nbsp;&nbsp;&nbsp;至&nbsp;&nbsp;&nbsp;</span>-->
+                <!--<input class="form-control search-query date-picker col-lg-3" style="width:155px;float:left;" name="end" readonly="readonly" value="0" placeholder="结束时间" type="text">-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="form-group">-->
+            <!--<label class="col-lg-3 control-label">手机认证 :<sup>*</sup></label>-->
+            <!--<div class="col-lg-9">-->
+                <!--<select name="auth" id="deviceid" class="form-control">-->
+                    <!--<option value="0">所有</option>-->
+                    <!--<option value="2">已认证</option>-->
+                    <!--<option value="1">未认证</option>-->
+                <!--</select>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="form-group">
+            <div class="col-lg-offset-2 col-lg-4">
+                <button id="pre1" style="margin-top: 5px; width:100px;" class="btn btn-primary" type="submit">导出数据</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    // 时间选择框
+    $('.date-picker').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    });
+    $('#AppForm2').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+            var data = $('#AppForm2').serialize();
+            var tourl="{:url('dlc/order/orderExport')}?"+data;
+            console.log(tourl);
+            $('.close').click();
+            window.location.href = tourl;
+            /*$.post(tourl,data,function(json){
+                if(json.status) {
+                    //$.App.alert('success', json.msg);
+                    //$('#refresh-toggler').click();
+                } else {
+                   // $.App.alert('danger', json.msg);
+                }
+
+            })*/
+        },
+    });
+</script>

@@ -1,0 +1,46 @@
+self.__precacheManifest = [
+  {
+    "revision": "720c47324c99cc143105",
+    "url": "js/chunk-vendors.7d96f9bd.js"
+  },
+  {
+    "revision": "b6216d61c03e6ce0c9aea6ca7808f7ca",
+    "url": "robots.txt"
+  },
+  {
+    "revision": "26243bfebf2055ab30ab",
+    "url": "js/app.d764ef3f.js"
+  },
+  {
+    "revision": "0017dab6559496f9ba4e",
+    "url": "js/about.937f2106.js"
+  },
+  {
+    "revision": "467a7eb27eca97c9c4844f05a2b8b31e",
+    "url": "index.html"
+  },
+  {
+    "revision": "1a1b26dab33f88326e4a954a39e53db1",
+    "url": "img/maker.1a1b26da.png"
+  },
+  {
+    "revision": "cce5861469e1d47de8e91aea98fdc73e",
+    "url": "img/logo-02.cce58614.png"
+  },
+  {
+    "revision": "4d30a584695692b963cd0e76cefbd7d0",
+    "url": "img/bg_Coupon_01.4d30a584.png"
+  },
+  {
+    "revision": "720c47324c99cc143105",
+    "url": "css/chunk-vendors.0ac1e5d4.css"
+  },
+  {
+    "revision": "26243bfebf2055ab30ab",
+    "url": "css/app.bef25c25.css"
+  },
+  {
+    "revision": "0017dab6559496f9ba4e",
+    "url": "css/about.f5ae23af.css"
+  }
+];

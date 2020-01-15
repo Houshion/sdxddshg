@@ -1,0 +1,248 @@
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">商品列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+
+
+            <div class="widget-body">
+                <div class="table-toolbar">
+                    <!--<a href="{:url('Dlc/Goods/edit')}" class="btn btn-primary" data-loader="App-loader" data-loadername="新增商品">-->
+                        <!--<i class="fa fa-plus"></i>新增商品-->
+                    <!--</a>&nbsp;&nbsp;-->
+
+                    <!--<a href="#" class="btn btn-danger" id="App-delall">-->
+                        <!--<i class="fa fa-delicious"></i>全部删除-->
+                    <!--</a>-->
+                    <!--<div  class="btn btn-info btn-primary" id="App-delall1" ><i class="fa fa-list"></i> 批量修改价格（此处修改可以修改在柜子中商品价格）-->
+                    <!--</div>-->
+                    <div class="pull-right">
+                        <form id="App-search">
+
+                            名称：<label style="margin-bottom: 0px;">
+                            <input name="title" type="search" class="form-control input-sm" value="{$title}" placeholder="商品名称">
+                        </label>  &nbsp;&nbsp;
+
+                            类别：<label style="margin-bottom: 0px;">
+                            <select name="type_id" class="form-control select-sm" type="search">
+                                <option value="">商品类别</option>
+                                {volist name="typeList" id="vo"}
+                                <option value="{$vo['type_id']}" {if condition="$vo['type_id'] eq $type_id"}selected{/if} >{$vo['type']}</option>
+                                {/volist}
+                            </select>
+                        </label> &nbsp;&nbsp;
+
+                            <a href="{:url('/Dlc/goods/index/')}" class="btn btn-success" data-loader="App-loader" data-loadername="" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                    <tr role="row">
+                        <th width="30px"><div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+                            <label style=" padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">
+                                <span class="text"></span>
+                            </label>
+                        </div></th>
+                        <th>ID</th>
+                        <th>名称</th>
+                        <th>图片</th>
+                        <th>类型</th>
+                        <th>重量</th>
+                        <th>单位</th>
+                        <th>单价</th>
+                        <th>成本价</th>
+                        <th>未上架</th>
+                        <th>在售</th>
+                        <th>已售</th>
+                        <!--<th>折扣</th>-->
+                        <!--<th>平台分佣(%)</th>-->
+                        <!--<th>补货员分佣(%)</th>-->
+                        <th width="300px">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {volist name="result" id="vo"}
+                    <tr>
+                        <td>
+                            <div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+                                <label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.goods_id}">
+                                    <span class="text"></span>
+                                </label>
+                            </div>
+                        </td>
+                        <td>{$vo['goods_id']}</td>
+                        <td>{$vo['title']}</td>
+                        <td>
+                            <a href="{$vo['img']}" target="_blank"><img style="width: 50px" src="{$vo['img']}"></a>
+                        </td>
+                        <td>{$vo['type']}</td>
+                        <td>{$vo['weight']}kg</td>
+                        <td>{$vo['unit']}</td>
+                        <td>{$vo['price']}</td>
+                        <td>{$vo['cost']}</td>
+                        <td>{$vo.unuse}</td>
+                        <td>{$vo.onsale}</td>
+                        <td>{$vo.sold}</td>
+                        <!--<td>-->
+                            <!--{if condition="empty($vo['sale'])"}-->
+                            <!--0-->
+                            <!--{else/}-->
+                            <!--{$vo['sale']}-->
+                            <!--{/if}-->
+                        <!--</td>-->
+
+                        <!--<td>{$vo['webrate']}%</td>-->
+                        <!--<td>{$vo['staffrate']}%</td>-->
+                        <td>
+                            <a href="{:url('/Dlc/goods/edit',['goods_id'=>$vo['goods_id']])}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="编辑"><i class="fa fa-edit"></i> 编辑</a> &nbsp;&nbsp;
+                             <!--<a href="{:url('/Dlc/goods/rfid',['goods_id'=>$vo['goods_id']])}" class="btn btn-info btn-xs" data-loader="App-loader" data-loadername="rfid列表"><i class="fa fa-list"></i> rfid列表</a> &nbsp;&nbsp;-->
+                            <a href="{:url('/Dlc/goods/delete/',['goods_id'=>$vo['goods_id']])}" class="btn btn-danger btn-xs" data-type = "del" data-ajax="{:url('/Dlc/goods/delete',['goods_id'=>$vo['goods_id']])}"><i class="fa fa-trash-o"></i> 删除</a>
+                        </td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                </table>
+                <div class="row DTTTFooter">
+                    {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax='/Dlc/goods/clear?goods_id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }
+        $.App.confirm("确认要删除吗？",funok);
+    });
+    $('#App-delall1').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要修改的商品！');
+            return false;
+        }
+        console.log(chk);
+        $.ajax({
+            type: 'post',
+            url:"{:Url('dlc/Goods/goodshtml')}",
+            data: {'goods_id': chk},
+            dataType: "html",
+            success: function (mb) {
+                bootbox.dialog({
+                    message: mb,
+                    title: "修改价格",
+                    className: "modal-darkorange",
+                    buttons: {
+                        success: {
+                            label: "确定",
+                            className: "btn-blue",
+                            callback: function () {
+                                var new_cost_price = $('.new_cost_price').val();
+                                var new_price = $('.new_price').val();
+                                var goods_id = $('.goods_id').val();
+                                $.ajax({
+                                    type:"post",
+                                    url:"{:Url('dlc/Goods/totalsavegoods')}",
+                                    data:{"goods_id": goods_id, "new_price": new_price,'new_cost_price':new_cost_price},
+                                    dataType:"json",
+                                    success:function (data) {
+                                        if(data.status == 1){
+                                            $.App.alert('success',data.msg,$('#refresh-toggler').trigger('click'));
+                                            $(_this).removeClass('btn-default');
+                                            $(_this).addClass('btn-success');
+                                            $(_this).siblings().removeClass('btn-success btn-default');
+                                            $(_this).siblings().removeClass('btn-default');
+                                        }else{
+                                            $.App.alert('danger',data.msg);
+                                        }
+                                    },
+                                    error:function () {
+                                        $.App.alert('danger', '通讯失败！请重试！');
+                                    }
+                                });
+                                //alert($('#nopass').val());
+                            }
+                        },
+                        "取消": {
+                            className: "btn-danger",
+                            callback: function () {}
+                        }
+                    }
+                });
+            },
+            error: function(xhr) {
+                $.App.alert('danger', '通讯失败！请重试！1');
+            }
+        })
+    });
+</script>
+<!--/全选特效封装-->

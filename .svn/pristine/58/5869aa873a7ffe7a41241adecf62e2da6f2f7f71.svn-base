@@ -1,0 +1,138 @@
+<link rel="stylesheet" href="__PUBLIC__/Admin/css/datepicker.css" />
+<script src="__PUBLIC__/Admin/js/bootstrap-datepicker.min.js"></script>
+<script src='__PUBLIC__/Admin/js/highcharts.js'></script>
+<div class="row" style="background:#FFF">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="col-xs-12 col-sm-12" style='padding:0'>
+						<form action="" method="get">
+							<div class="input-group" style="text-align:right;margin-bottom:10px;">
+									交易时间：<input readonly="readonly" class="form-control search-query date-picker" style="width:120px;float:none;" name="start" value="" placeholder="开始时间" type="text">&nbsp;至&nbsp;<input class="form-control search-query date-picker" style="width:120px;float:none;" name="end" readonly="readonly" value="" placeholder="结束时间" type="text">
+									&nbsp;&nbsp;<span class="input-group-btn">
+										<button type="submit" class="btn btn-purple btn-sm">
+											搜索
+											<i class="ace-icon fa fa-search icon-on-right bigger-110"></i>
+										</button>
+									</span>
+							</div>
+						</form>
+					</div>
+			<div class="col-xs-6">
+						
+						<div id="container" style="min-width:400px;height:700px"></div>
+		
+					</div>
+			<div class="col-xs-6">
+						<div id="container1" style="min-width:400px;height:700px"></div>
+
+					</div>
+                    </div>
+            <!-- <div class="col-xs-6">
+                        <div id="container2" style="min-width:400px;height:260px"></div>
+                        <volist name="shop" id="vo">
+                        </volist>
+                    </div> -->
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<script>
+
+	
+$(function () {
+	// 横柱状图
+  $('#container').highcharts({
+    chart: {
+        type: 'bar'
+    },
+    title: {
+        text: '员工销售排名前10名'
+    },
+    xAxis: {
+        categories: [
+			<volist name="list" key="k" id="vo">
+				"{$vo.username}  (公司：{$vo.shop_name})",
+			</volist>
+		]
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: '销售商品数量'
+        }
+    },
+    legend: {
+        reversed: true
+    },
+    plotOptions: {
+        series: {
+            stacking: 'normal'
+        }
+    },
+    series: [{
+        name: '销售商品数量',
+        data: [
+			<volist name="list" key="k" id="vo">
+				{$vo.goods_num},
+			</volist>
+		]
+    }]
+  });
+
+  // 饼状图
+  $('#container1').highcharts({
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false
+    },
+    title: {
+        text: '员工销售排名（前10名)'
+    },
+    tooltip: {
+    	//pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        pointFormat: '{series.nickname}: <b>{point.percentage:.2f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                //format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                style: {
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                }
+            }
+        }
+    },
+    series: [{
+        type: 'pie',
+        name: '所占比例',
+        data: [
+					<volist name="list" key="k" id="vo">
+					['{$vo.name}',{$vo.goods_num}],
+					</volist>
+					
+                ]
+    }]
+	});
+
+
+  // 时间选择框
+	$('.date-picker').datepicker({
+		format: 'yyyy-mm-dd',
+		autoclose: true,
+		todayHighlight: true
+	});
+
+
+});
+
+</script>

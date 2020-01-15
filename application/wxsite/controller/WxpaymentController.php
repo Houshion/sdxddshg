@@ -1,0 +1,338 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 马远利
+ * Date: 2018/3/9
+ * Time: 16:07
+ */
+
+namespace app\wxsite\controller;
+use \think\Loader;
+use \think\Db;
+use \think\Model;
+use app\common\model\Order;
+
+class WxpaymentController extends BaseController
+{
+
+    public $appUrl = "";
+	
+    public $user_id;
+	
+	protected $appid = 'wxca3e97c51546fc3e';                      //微信appid
+	
+	protected $appsecret = 'b5d85cca9d14e22e68f2cfbd560a1b92';    //微信appsecret
+	
+	protected $mchid = '1521670631';                              //微信商户id
+	
+	protected $mchsecret = '9e0276b0b984a91b811b554093dd2748';    //微信API密匙
+	
+    protected $plan_id = '';                                //微信免密支付模板id
+	
+	protected $unifiedOrder;                                      //微信统一支付变量
+	
+	protected $weburl = 'http://sdxddshg.app.xiaozhuschool.com/wxsite/Wxpayment/';     //回调域名
+	
+    public function _initialize()
+    {
+		Vendor("WxPayPubHelper.WxPayPubHelper");
+        $this->unifiedOrder = new \UnifiedOrder_pub($this->appid, $this->appsecret,$this->mchid,$this->mchsecret);
+        write_log('wxpay'," 返回数据1：".json_encode($this->unifiedOrder,true));
+    }
+
+
+    public function loadWxpayConfig($data)
+    {
+        $this->appid = $data['appid'];
+        $this->appsecret = $data['appsecret'];
+        $this->mchid = $data['mchid'];
+        $this->mchsecret = $data['mchsecret'];
+        $this->plan_id = $data['plan_id'];
+    }
+	
+	/**
+	 * 唤起微信委托代扣的页面
+	 * @param  string  $contract_code   签约协议号
+	 * @param  string  $request_serial  请求序列号,必须唯一
+	 * @return none
+     *8B77845339F69D9EEF8D758AE308617E
+     *8B77845339F69D9EEF8D758AE308617E
+	 */
+	public function contractorder($contract_code= '',$request_serial='',$shop_id=0){
+
+
+		 $obj['appid'] = $this->appid;
+		 $obj['mch_id'] = $this->mchid;
+		 $obj['plan_id'] = $this->plan_id;
+		 $obj['contract_code'] = $contract_code;
+		 $obj['request_serial'] = $request_serial;
+		 $obj['contract_display_account'] = 'XBuy随心购自助购物收款';
+		 $obj['notify_url'] ='http://sdxddshg.app.xiaozhuschool.com/wxsite/Wxpayment/contractnotify';
+		 $obj['version'] = '1.0';
+         $obj['return_web'] = 1;
+		 $obj['timestamp'] = (string)time();
+		 $obj['sign'] =  $this->unifiedOrder->getSign($obj);
+
+//        $sign =  $this->unifiedOrder->getSign($obj);
+//		 $this->_return(1,'免密支付',$obj);
+//		 $info['code'] = 404;
+//         $info['msg'] = '免密支付';
+//		 $info['data'] = $obj;
+//		 echo json_encode($info);
+//         return $info;
+		 $url = "https://api.mch.weixin.qq.com/papay/entrustweb?appid=".$this->appid."&contract_code=".$obj['contract_code']."&contract_display_account=".$obj['contract_display_account']."&mch_id=1511220331&notify_url=".urlencode($obj['notify_url'])."&plan_id=".$this->plan_id."&request_serial=".$obj['request_serial']."&timestamp=".$obj['timestamp']."&return_web=1&version=1.0&sign=". $obj['sign'] ;
+//        write_log('wxpay','微信免密支付请求开始：url11111111 ='.$url);
+		 return $url;
+//		 header("Location: $url");
+	}
+	
+	/**
+	 * 微信委托代扣回调
+	 * @param  none
+	 * @return none            
+	 */
+	public function contractnotify(){
+
+		//使用通用通知接口
+		$notify = new \Wxpay_server_pub($this->appid, $this->appsecret,$this->mchid,$this->mchsecret);
+		//存储微信的回调
+		$xml = $GLOBALS['HTTP_RAW_POST_DATA'];
+		$notify->saveData($xml);
+
+		//write_log('wxpay','微信免密支付数据：'.json_encode($notify->data));
+		//微信会通过一定的策略（如30分钟共8次）定期重新发起通知，
+        if ($notify->checkSign() == FALSE) {
+            $notify->setReturnParameter("return_code", "FAIL"); //返回状态码
+            $notify->setReturnParameter("return_msg", "签名失败"); //返回信息
+            write_log('wxpay'," 签名失败");
+        } else {
+            $notify->setReturnParameter("return_code", "SUCCESS"); //设置返回码
+		    $notify->setReturnParameter("return_msg", "OK"); //返回信息
+            write_log('wxpay'," 签名成功");
+        }
+
+
+		//==商户根据实际情况设置相应的处理流程，此处仅作举例=======
+        if($notify->checkSign() == true) {
+            if ($notify->data["return_code"] == "SUCCESS") {
+                $change_type = $notify->data["change_type"];
+                $where['openid'] = $notify->data["openid"];
+                $user = Db::name('user')->where($where)->find();
+                //write_log('wxpay','微信免密支付开通回调：'.json_encode($notify->data));
+                if(!empty($user)&&$user['contract_id']!=$notify->data["contract_id"]){
+                    write_log('wxpay1','授权回调：'.json_encode($notify->data));
+                    $data['is_contract'] = $change_type == 'ADD' ? 1 : 0;
+                    $data['contract_code'] = $notify->data["contract_code"];
+                    $data['contract_id'] = $notify->data["contract_id"];
+                    $data['request_serial'] = $notify->data["request_serial"];
+                    $data['operate_time'] = $notify->data["operate_time"];
+                    $data['contract_expired_time'] = $notify->data["contract_expired_time"];
+                    write_log('wxpay'," 更新数据 data =".json_encode($data).'----user_id--'.$user['user_id']);
+                    $re = Db::name('user')->where($where)->update($data);
+                    //write_log('wxpay','更新结果 re='.json_encode($re));
+                }
+                echo 'success';
+            }
+        }
+        $returnXml = $notify->returnXml();
+
+	}
+	
+	
+	
+    /**
+	 * 查询微信委托代扣签约关系
+	 * @param  string  $openid   用户微信授权openid
+	 * @return none            
+	 */	
+	public function querycontract($openid = ''){
+		$url = 'https://api.mch.weixin.qq.com/papay/querycontract';
+        write_log('wxpay',"委托代扣进来了-----");
+        //使用统一支付接口
+		$obj['appid'] = $this->appid;
+		$obj['mch_id'] = $this->mchid;
+		$obj['plan_id'] = $this->plan_id;
+		$obj['openid'] = $openid;
+		$obj['version'] = '1.0';
+		$obj['sign'] =  $this->unifiedOrder->getSign($obj);
+		$xml = $this->unifiedOrder->arrayToXml($obj);
+		$result = $this->unifiedOrder->postXmlCurl($xml,$url);
+		$arr = $this->unifiedOrder->xmlToArray($result);
+        write_log('wxpay',"委托代扣进来了---obj--".json_encode($obj,true));
+        write_log('wxpay',"委托代扣进来了---arr--".json_encode($arr,true));
+        write_log('wxpay',"委托代扣进来了---url--".$url);
+		if($arr['return_code'] == 'SUCCESS' && $arr['result_code'] == 'FAIL'){ //未授权免密支付
+//			echo "未授权免密支付";
+			return true;
+		}elseif($arr['return_code'] == 'SUCCESS' && $arr['contract_state'] == 1){ //已解约
+//			echo "已解约";
+			return true;
+		}else{
+//			echo "已开通免密支付";
+			return false;
+		}
+	}
+	
+	/**
+	 * 微信委托代扣申请扣款
+	 * @param  none
+	 * @return none            
+	 */	
+        public function pappayapply($contract_id = "",$pay_id = '',$order_id = 1,$money = 0.01,$user_id = 0){
+		write_log('wxpay','微信免密支付请求开始：contract_id ='.$contract_id.' pay_id ='.$pay_id.' order_id ='.$order_id.' money ='.$money.' user_id='.$user_id);
+//		$money = 0.01;
+            $unifiedOrder = new \UnifiedOrder_pub($this->appid,$this->appsecret, $this->mchid,$this->mchsecret);
+           $order_user_id= db('order')->where(['order_number'=>$pay_id])->value('user_id');//查找下单的用户id
+            if($order_user_id==$user_id){
+                $unifiedOrder->setParameter("body", '自助售货购物'); //商品描述
+                $unifiedOrder->setParameter("out_trade_no", $pay_id); //支付订单id
+                $unifiedOrder->setParameter("total_fee", ($money*100)); //总金额
+                $unifiedOrder->setParameter("notify_url",  $this->weburl.'paynotify');//通知地址pay
+                $unifiedOrder->setParameter("trade_type", "PAP");//交易类型
+                $unifiedOrder->setParameter("contract_id", $contract_id);//免密支付协议号
+                $xml = $unifiedOrder->getXml();
+
+               $res= db('order')->where(['order_number'=>$pay_id,'user_id'=>$user_id])->update(['pay_price'=>$money]);
+
+//                if($xml['result_code'] == 'FAIL'){
+//                    //免密支付失败原因写入订单
+//                    Db::name('order')->where('order_number',$pay_id)->update(['reason'=>$xml['err_code_des']]);
+//                }
+                write_log('wxpay','微信免支付订单：'.$pay_id.' result='.json_encode($xml));
+
+                return $xml;
+            }
+	}
+    public function test(){
+
+		$money = 0.01;
+		$contract_id=input('contract_id');
+		$out_trade_no=date('YmdHis').mt_rand(100000,999999);
+        $unifiedOrder = new \UnifiedOrder_pub($this->appid,$this->appsecret, $this->mchid,$this->mchsecret);
+            $unifiedOrder->setParameter("body", '自助售货购物'); //商品描述
+            $unifiedOrder->setParameter("out_trade_no", $out_trade_no); //支付订单hao2
+            $unifiedOrder->setParameter("total_fee", ($money*100)); //总金额
+            $unifiedOrder->setParameter("notify_url",  $this->weburl.'paynotify');//通知地址
+            $unifiedOrder->setParameter("trade_type", "PAP");//交易类型
+            $unifiedOrder->setParameter("contract_id", $contract_id);//免密支付协议号
+            $xml = $unifiedOrder->getXml();
+
+        write_log('wxpay1',"免密支付返回：".json_encode($xml,true));
+            print_r($xml);
+////            print_r($out_trade_no);
+//            die;
+//            、、return $xml;
+
+    }
+
+    public function test2($openid = 'oRW6m1AGov9XXOkYA9ZW4yZFIU2M'){
+        $url = 'https://api.mch.weixin.qq.com/papay/querycontract';
+        //使用统一支付接口
+        $obj['appid'] = $this->appid;
+        $obj['mch_id'] = $this->mchid;
+        $obj['plan_id'] = $this->plan_id;
+        $obj['openid'] = $openid;
+        $obj['version'] = '1.0';
+        $obj['sign'] =  $this->unifiedOrder->getSign($obj);
+        $xml = $this->unifiedOrder->arrayToXml($obj);
+        $result = $this->unifiedOrder->postXmlCurl($xml,$url);
+        $arr = $this->unifiedOrder->xmlToArray($result);
+        write_log('wxpay1',"查询签约返回：".json_encode($arr,true));
+
+        if($arr['return_code'] == 'SUCCESS' && $arr['result_code'] == 'FAIL'){ //未授权免密支付
+			echo "未授权免密支付";
+//            return true;
+        }elseif($arr['return_code'] == 'SUCCESS' && $arr['contract_state'] == 1){ //已解约
+			echo "已解约";
+//            return true;
+        }else{
+			echo "已开通免密支付";
+//            return false;
+        }
+    }
+	/**
+	 * 微信委托代扣支付回调
+	 * @param  none
+	 * @return none            
+	 */	
+	public function paynotify(){
+
+    	//使用通用通知接口
+        $notify = new \Notify_pub($this->appid, $this->appsecret,$this->mchid,$this->mchsecret);
+        //存储微信的回调
+        if (version_compare(PHP_VERSION, '7.0.0', '>')){
+            $xml = file_get_contents("php://input");//php7下
+        }else{
+            $xml = $GLOBALS['HTTP_RAW_POST_DATA'];
+        }
+        write_log('test1','微信回调paynotify--XML---'.json_encode($xml,true));
+        $notify->saveData($xml);
+        $data = $notify->getData();
+        write_log('test1','微信回调paynotify--DATA-----'.json_encode($data,true));
+        //验证签名，并回应微信。
+        //对后台通知交互时，如果微信收到商户的应答不是成功或超时，微信认为通知失败，
+        //微信会通过一定的策略（如30分钟共8次）定期重新发起通知，
+        //尽可能提高通知的成功率，但微信不保证通知最终能成功。
+        if ($notify->checkSign() == FALSE) {
+            $notify->setReturnParameter("return_code", "FAIL");//返回状态码
+            $notify->setReturnParameter("return_msg", "签名失败");//返回信息
+        } else {
+            $notify->setReturnParameter("return_code", "SUCCESS");//设置返回码
+        }
+		import("WxpayController");
+//		$WxpayController = new WxpayController;
+//		$WxpayController->payReturn($data['out_trade_no'],$data['transaction_id'],1);
+        $Order= new Order();
+        if($data['transaction_id']){
+            $Order->payOk($data['transaction_id'],$data['out_trade_no'],'','');
+            echo 'success';
+        }else{
+            db('order')->where('order_number',$data['out_trade_no'])->update(['reason'=>'免密扣款失败']);
+            echo 'FAIL';
+        }
+        $returnXml = $notify->returnXml();
+        write_log('test2','接受数据时间2--'.json_encode($data,true));
+
+	  }
+	
+	/**
+	 * 微信委托代扣申请解约
+	 * @param  none
+	 * @return none             
+	 */	
+	public function deletecontract(){
+		
+	}
+
+    /**
+     * 查询免密支付是否成功
+     * @param  none
+     * @return none
+     */
+    public function paporderquery(){
+        $url = 'https://api.mch.weixin.qq.com/pay/paporderquery';
+        Vendor("WxPayPubHelper.WxPayPubHelper");
+        $wxConfig = model("WxConfig")->find();
+        $wx_pay = model("payment")->where('type','wxpay')->find();
+        $config = json_decode($wx_pay['config'],true);
+        //使用统一支付接口
+        $unifiedOrder = new \UnifiedOrder_pub($wxConfig["appid"], $wxConfig["appsecret"], $config["mchid"], $config["key"]);
+        $obj['appid'] = $this->appid;
+        $obj['mch_id'] = $this->mchid;
+        $obj['plan_id'] = $this->plan_id;
+        $obj['openid'] = 'oRW6m1O5Ir99IBldYJWd7RXTHc9k';
+        $obj['version'] = '1.0';
+        $obj['sign'] =  $unifiedOrder->getSign($obj);
+        $xml = $unifiedOrder->arrayToXml($obj);
+        $result = $unifiedOrder->postXmlCurl($xml,$url);
+        $arr = $unifiedOrder->xmlToArray($result);
+        if($arr['return_code'] == 'SUCCESS' && $arr['result_code'] == 'FAIL'){ //未授权免密支付
+            return true;
+        }elseif($arr['return_code'] == 'SUCCESS' && $arr['contract_state'] == 1){ //已解约
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+}

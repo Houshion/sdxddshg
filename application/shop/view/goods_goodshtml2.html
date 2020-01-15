@@ -1,0 +1,66 @@
+<!--<link href="{$Think.config.dlccss}select2.min.css" rel="stylesheet" />-->
+
+<!--<script src="{$Think.config.dlcjs}select2.full.min.js"></script>-->
+<link href="{$Think.config.dlccss}jquery.searchableSelect.css" rel="stylesheet" />
+<script src="{$Think.config.dlcjs}jquery.searchableSelect.js"></script>
+<style>
+
+    .select1{
+
+        width: 100%;
+    }
+    .select1>span{
+        width: 100% !important;
+    }
+</style>
+<div class="row">
+    <div class="col-xs-12 col-xs-12">
+        <div class="widget radius-bordered">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">请选择所属时间段折扣</span>
+                <div class="widget-buttons">
+                    <!--<a href="#" data-toggle="maximize">-->
+                        <!--<i class="fa fa-expand"></i>-->
+                    <!--</a>-->
+                    <!--<a href="#" data-toggle="collapse">-->
+                        <!--<i class="fa fa-minus"></i>-->
+                    <!--</a>-->
+                    <!--<a href="#" data-toggle="dispose">-->
+                        <!--<i class="fa fa-times"></i>-->
+                    <!--</a>-->
+                </div>
+            </div>
+            <div class="widget-body">
+                <form id="AppForm" action="" method="post" class="form-horizontal"
+                      data-bv-message=""
+                      data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+                      data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
+                      data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                    <input name="goods_id" class="goods_id" type="hidden"  value="{$goods_id}" >
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">时间段</label>
+                        <div class="col-lg-4" >
+                            <div class="select1">
+                                <select id="mySelect" class="time_id">
+                                    <option value="">请选择</option>
+                                    {volist name="list" id='vo'}
+                                    <option value="{$vo.time_id}">{$vo.start_time}--{$vo.end_time}::折扣{$vo.sale}折</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(function(){
+        $('#mySelect').searchableSelect();
+    });
+</script>

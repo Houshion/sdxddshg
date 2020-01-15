@@ -1,0 +1,813 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 韩令恺
+ * Date: 2018/5/17 0017
+ * Time: 16:12
+ */
+
+namespace app\wxsite\controller;
+use \think\Db;
+
+class UserController extends BaseController
+{
+    public $appUrl = "";
+    public $user_id;
+    public function _initialize()
+    {
+
+        $this->appUrl = request()->root(true).'/public/';
+
+        // $this->appUrl = 'http://'.$_SERVER['HTTP_HOST'];
+    }
+
+    /**
+     *接口入口
+     */
+    public function api()
+    {
+        $api_name = input('api_name');
+        $this->user_id = $this->get_user_id();
+        if ($api_name) {
+            switch ($api_name) {
+                case 'userInfo':
+                    $this->userInfo(); //获取用户资料
+                    break;
+                case 'userNicknameSet':
+                    $this->userNicknameSet(); //修改昵称
+                    break;
+                case 'userHeadSet':
+                    $this->userHeadSet(); //修改头像
+                    break;
+                case 'userMobileSet':
+                    $this->userMobileSet(); //绑定手机
+                    break;
+                case 'sendSms':
+                    $this->sendSms(); //发送短信
+                    break;
+                case 'userAuth':
+                    $this->userAuth(); //实名认证
+                    break;
+                case 'moneyList':
+                    $this->moneyList(); //充值规则
+                    break;
+                case 'coupon':
+                    $this->coupon(); //优惠券
+                    break;
+                case 'capital':
+                    $this->capital(); //资金明细
+                    break;
+                case 'orderList':
+                    $this->orderList(); //订单列表
+                    break;
+                case 'orderDetail':
+                    $this->orderDetail(); //订单详情
+                    break;
+                case 'favorite':
+                    $this->favorite(); //收藏夹
+                    break;
+                case 'getFavorite':
+                    $this->getFavorite(); //点击收藏
+                    break;
+                case 'delFavorite':
+                    $this->delFavorite(); //取消收藏
+                    break;
+                case 'cooperation':
+                    $this->cooperation(); //合作加盟
+                    break;
+                case 'feedback':
+                    $this->feedback(); //提交反馈意见
+                    break;
+                case 'feedbackLog':
+                    $this->feedbackLog(); //反馈记录
+                    break;
+                case 'feedbackDetail':
+                    $this->feedbackDetail(); //反馈详情
+                    break;
+                case 'myMoney':
+                    $this->myMoney(); //我的钱包
+                    break;
+                case 'sendSmsCaptcha':
+                    $this->sendSmsCaptcha(); //发送短信验证码
+                    break;
+                case 'savePass':
+                    $this->savePass(); //修改密码
+                    break;
+                case 'uploadImg':
+                    $this->uploadImg(); //图片上传
+                case 'meallist':
+                    $this->meallist(); //套餐列表
+                case 'rechargemeal':
+                    $this->rechargemeal(); //套餐冲值
+                case 'mywallet':
+                    $this->mywallet(); //我的钱包
+                case 'rechargelog':
+                    $this->rechargelog(); //我的钱包
+                default:
+                    $info['code'] = 404;
+                    $info['msg'] = '接口不存在';
+                    if($this->request->isAjax()) {
+                        return $info;
+                    } else {
+                        echo json_encode(['code'=>404, 'msg'=>'接口不存在']);
+                    }
+
+                    break;
+            }
+        }else{
+
+//            $info['code'] = 404;
+//            $info['msg'] = '接口不能为空';
+//            $info['data'] = $api_name;
+//            return $info;
+            $this->_return(404,'接口名不能为空',$api_name);
+        }
+    }
+
+
+
+    //获取用户资料
+    public function userInfo(){
+        $token = $_POST['token'];
+        if (!$token) $this->_return(-1,'缺少参数');
+        $user_id= $this->decodeToken($token);
+        $result = Db::name('user')->where(['user_id'=>$user_id])->field('head_img,nickname,mobile,money,auth')->find();
+        if (!$result) $this->_return(-1,'用户不存在');
+        //可能没拼接对，到时候测试一下
+        if (strpos($result['head_img'],'/imgs')){
+            $result['head_img'] = $this->appUrl.$result['head_img'];
+        }
+        db('about')->where('')->value('tel');
+        $this->_return(1,'获取成功',$result);
+    }
+
+//修改密码
+
+
+    //修改昵称
+    public function userNicknameSet(){
+        $token = $_POST['token'];
+        if (!$_POST['nickname']) $this->_return(-1,'缺少参数');
+        $result = Db::name('user')->where(['token'=>$token])->update(['nickname'=>$_POST['nickname']]);
+        if (!$result) $this->_return(-1,'修改失败');
+        $this->_return(1,'修改成功');
+    }
+
+    //修改头像
+    public function userHeadSet(){
+        $token = $_POST['token'];
+        if (!$token) $this->_return(-1,'缺少参数');
+        if ($_POST['img_url']){
+            $res_user = Db::name('user')->where(['token'=>$token])->update(['head_img'=>$_POST['img_url']]);
+            if($res_user !== false){
+                $this->_return(1,'修改头像成功');
+            }else{
+                $this->_return(-1,'修改头像失败');
+            }
+        }else{
+            if($_FILES['cover']){
+
+                $url = $this->upload('cover',1);
+                $res_user = Db::name('user')->where(['token'=>$token])->update(['head_img'=>$url]);
+                if($res_user !== false){
+                    $this->_return(1,'修改头像成功');
+                }else{
+                    $this->_return(-1,'修改头像失败');
+                }
+            }else{
+                $this->_return(-1,'头像图片不能为空');
+            }
+        }
+    }
+
+    //绑定手机
+    public function userMobileSet(){
+        if (!$_POST['token']) $this->_return(-1,'缺少token');
+        if (!$_POST['mobile']) $this->_return(-1,'缺少号码');
+        if (!$_POST['sms_code']) $this->_return(-1,'缺少验证码');
+        $smsVerify = Db::name('sms_verify')->order('id desc')->where(['mobile'=>$_POST['mobile'],'type'=>2])->find();
+        if (!$smsVerify) $this->_return(-1,'验证码错误');
+        if ($_POST['sms_code'] != $smsVerify['code']) $this->_return(-1,'验证码错误');
+        if ($smsVerify['ctime'] < (time()-300)) $this->_return(-1,'验证码已过期');
+        $user = Db::name('user')->where(['mobile'=>$_POST['mobile'],'token'=>['neq',$_POST['token']]])->find();
+        if ($user) $this->_return(-1,'该号码已被使用');
+        $result = Db::name('user')->where(['token'=>$_POST['token']])->update(['mobile'=>$_POST['mobile']]);
+        if (!$result) $this->_return(-1,'绑定失败');
+        $this->_return(1,'绑定成功');
+
+    }
+
+    /**
+     * 发送短信
+     */
+    function sendSms() {
+
+        $mobile = $_POST['mobile'];
+        if (!$mobile) $this->_return(-1,'手机号码不能为空');
+        if($this->check_mobile($mobile))_return(-1,'手机号码有误');
+        $code = mt_rand(10000,99999);
+        $config = Db::name('sms')->where(['id'=>1])->find();
+
+        $params = array ();
+
+        // *** 需用户填写部分 ***
+
+        // fixme 必填: 请参阅 https://ak-console.aliyun.com/ 取得您的AK信息
+        $accessKeyId = 'LTAIJND8HWx755jY';
+        $accessKeySecret = 'aSsp1NZ9NDZNgp54G3XpVz97RRe8tv';
+
+        // fixme 必填: 短信接收号码
+        $params["PhoneNumbers"] = $mobile;
+
+        // fixme 必填: 短信签名，应严格按"签名名称"填写，请参考: https://dysms.console.aliyun.com/dysms.htm#/develop/sign
+        $params["SignName"] = '阿里云短信测试专用';
+
+        // fixme 必填: 短信模板Code，应严格按"模板CODE"填写, 请参考: https://dysms.console.aliyun.com/dysms.htm#/develop/template
+        $params["TemplateCode"] = "SMS_135305056";
+
+        // fixme 可选: 设置模板参数, 假如模板中存在变量需要替换则为必填项
+        $params['TemplateParam'] = Array (
+            "code" => $code,
+            "product" => "1111"
+        );
+
+        // fixme 可选: 设置发送短信流水号
+        $params['OutId'] = "";
+
+        // fixme 可选: 上行短信扩展码, 扩展码字段控制在7位或以下，无特殊需求用户请忽略此字段
+        $params['SmsUpExtendCode'] = "";
+
+
+        // *** 需用户填写部分结束, 以下代码若无必要无需更改 ***
+        if(!empty($params["TemplateParam"]) && is_array($params["TemplateParam"])) {
+            $params["TemplateParam"] = json_encode($params["TemplateParam"], JSON_UNESCAPED_UNICODE);
+        }
+
+        // 初始化SignatureHelper实例用于设置参数，签名以及发送请求
+        $helper = new \Aliyun\SignatureHelper();
+        // 此处可能会抛出异常，注意catch
+        $content = $helper->request(
+            $accessKeyId,
+            $accessKeySecret,
+            "dysmsapi.aliyuncs.com",
+            array_merge($params, array(
+                "RegionId" => "cn-hangzhou",
+                "Action" => "SendSms",
+                "Version" => "2017-05-25",
+            ))
+        // fixme 选填: 启用https
+         ,true
+        );
+
+        if ($content->Code == 'OK'){
+            $smsData = array(
+                'mobile'    =>  $mobile,
+                'code'      =>  $code,
+                'ctime'     =>  time()
+            );
+            $res = Db::name('sms_verify')->insert($smsData);
+            if (!$res) $this->_return(-1,'短信数据未储存到');
+            $this->_return(1,'发送成功');
+        }else{
+            $this->_return(-1,'发送失败');
+        }
+
+    }
+
+
+    //实名认证
+    public function userAuth(){
+        if (!$_POST['card'] || !$_POST['real_name'] || !$_POST['token']) $this->_return(-1,'缺少参数');
+        $userInfo = Db::name('user')->where(['token'=>$_POST['token']])->find();
+        if ($userInfo['auth'] == 2) $this->_return(-1,'用户已经认证成功不需要再次认证');
+//        $userAuth = Db::name('user_auth')->where(['user_id'=>$userInfo['user_id'],'status'=>0])->find();
+//        if ($userAuth) $this->_return(-1,'已经提交过，请耐心等待审核，不需要再次提交');
+        $authData = array(
+            'user_id'       =>  $userInfo['user_id'],
+            'identity_card' =>  $_POST['card'],
+            'real_name'     =>  $_POST['real_name'],
+            'status'        =>  0,
+            'ctime'         =>  time()
+        );
+        $result = Db::name('user_auth')->insert($authData);
+        $userSet = Db::name('user')->where(['user_id'=>$userInfo['user_id']])->update(['auth'=>2]);
+        if (!$result || !$userSet) $this->_return(-1,'资料提交失败');
+        $this->_return(1,'资料提交成功，请等待审核');
+    }
+
+
+
+    //充值规则(列表)
+    public function moneyList(){
+        $data= Db::name('regulation')->order('regulation_id desc')->field('regulation_id,money')->select();
+
+        $this->_return(1,'获取成功',$data);
+    }
+
+
+    //优惠券
+    public function coupon(){
+        $page = $_POST['page']?$_POST['page']:1; //页码
+        $pagesize = $_POST['pagesize']?$_POST['pagesize']:10; //每页条数
+        $condition['user_id'] = $this->user_id;
+         $order_nubert= input('order_nubert');
+//        $condition['indate'] = ['>',time()];
+//        $condition['status'] = 0;
+        $map=[];
+        if($order_nubert){
+          $findorder=  db('order')->where('order_number',$order_nubert)->find();
+          $condition['user_money']=['<',$findorder['pay_price']];
+          $condition['shop_id']=$findorder['shop_id'];
+          $map['coupon_id']=0;
+          $map['shop_id']=0;
+        }
+        $result = Db::name('coupon_log')->where($condition)->whereOr($map)->page($page,$pagesize)->order('ctime desc')->select();
+
+        foreach ($result as $k=>$v){
+            if($v['status']==1){
+                $result[$k]['status_name']='已使用';
+            }else{
+                if($v['indate']<time()){
+                    $result[$k]['status_name']='已过期';
+                }else{
+                    $result[$k]['status_name']='未使用';
+                }
+
+            }
+            $result[$k]['indate']=date('Y-m-d',$v['indate']);
+
+        }
+        $this->_return(1,'获取成功',$result);
+    }
+
+
+    //资金明细
+    public function capital(){
+        $page = $_POST['page']?$_POST['page']:1; //页码
+        $pagesize = $_POST['pagesize']?$_POST['pagesize']:10; //每页条数
+        $res = Db::name('cash_log')->where(['user_id'=>$this->user_id])->page($page,$pagesize)->order('ctime desc')->select();
+
+        if ($res){
+            foreach ($res as $k=>$v){
+                if ($v['type'] == 2){ //充值
+                    $res[$k]['text'] = '充值';
+                }else{ //订单消费
+                    if ($res[$k]['pay_type'] == 1){ //余额支付
+                        $res[$k]['text'] = '微信支付';
+                    }elseif ($res[$k]['pay_type'] == 2){ //微信支付
+                        $res[$k]['text'] = '支付宝支付';
+                    }else{
+                        $res[$k]['text'] = '余额';
+                    }
+                }
+
+
+            }
+        }
+        $this->_return(1,'获取成功',$res);
+    }
+
+
+    //我的订单
+    public function orderList(){
+        $page = $_POST['page']?$_POST['page']:1; //页码
+        $pagesize = $_POST['pagesize']?$_POST['pagesize']:10; //每页条数
+        $field = 'order_id,order_number,status,num,pay_price,pay_time,total_price';
+        $condition['user_id'] = $this->user_id;
+//        if ($_POST['shop_id']){
+//            $condition['shop_id'] = $_POST['shop_id'];
+//        }else{
+//
+//        }
+//        $condition['status'] = ['<>',1];
+        $condition['status'] = ['in',[2,3]];
+        $orderList = Db::name('order')->where($condition)->field($field)->order('order_id desc')->page($page,$pagesize)->select();
+        foreach ($orderList as $k=>$v){
+            $orderList[$k]['goods'] = Db::name('order_info')->alias('a')
+                                        ->join('goods b','a.goods_id=b.goods_id')
+                                        ->field('a.price,a.num,b.title,b.img')
+                                        ->where(['a.order_id'=>$v['order_id']])
+                                        ->select();
+            if ($orderList[$k]['goods']){
+                foreach ($orderList[$k]['goods'] as $key=>$val){
+                    $orderList[$k]['goods'][$key]['img'] = $this->appUrl.'/'.$val['img'];
+                }
+            }
+            if(!$_POST['shop_id']){
+               $find= db('feedback')->where(array('user_id'=>$this->user_id,'order_no'=>$v['order_number']))->find();
+               if($find){
+                   $orderList[$k]['f_status']=$find['status'];
+                   $orderList[$k]['feedback_id']=$find['id'];
+               }else{
+                   $orderList[$k]['f_status']=2;
+                   $orderList[$k]['feedback_id']=0;
+               }
+            }
+
+        }
+
+        $this->_return(1,'获取成功',$orderList);
+    }
+
+    //订单详情
+    public function orderDetail(){
+
+        if (!$_POST['order_id']) $this->_return(-1,'缺少参数');
+        $order_id=$_POST['order_id'];
+        $field = 'a.order_id,a.order_number,a.status,a.num,a.pay_price,a.pay_time,a.discount_id,a.discount_money,a.total_price,b.macno,a.ctime';
+        $orderRow = Db::name('order')->alias('a')
+            ->join('dlc_device b ','b.device_id=a.device_id','left')
+            ->where(['a.order_id'=>$order_id])->field($field)->find();
+//        print_r( $orderRow);
+//        die;
+        if(empty($orderRow['ctime'])){
+            $orderRow['ctime']='';
+
+        }else{
+            $orderRow['ctime']=date('Y-m-d H:i:s');
+        }
+        $orderRow['goods'] = Db::name('order_info')->alias('a')
+                            ->join('goods b','a.goods_id=b.goods_id')
+                            ->field('a.price,a.num,b.title,b.img')
+                            ->where(['order_id'=>$orderRow['order_id']])
+                            ->select();
+        $orderRow['mobile'] = '';
+        if ($orderRow['goods']){
+            foreach ($orderRow['goods'] as $key=>$val){
+                $orderRow['goods'][$key]['img'] = $this->appUrl.'/'.$val['img'];
+            }
+        }
+
+        if($orderRow){
+            $find= db('feedback')->where(array('user_id'=>$this->user_id,'order_no'=>$orderRow['order_number']))->find();
+            if($find){
+                $orderRow['f_status']=$find['status'];
+                $orderRow['feedback_id']=$find['id'];
+            }else{
+                $orderRow['f_status']=2;
+                $orderRow['feedback_id']=0;
+            }
+        }
+
+        $this->_return(1,'获取成功',$orderRow);
+    }
+
+
+    //收藏夹
+    public function favorite(){
+        $page = $_POST['page']?$_POST['page']:1; //页码
+        $pagesize = $_POST['pagesize']?$_POST['pagesize']:10; //每页条数
+        $res = Db::name('favorite')->where(['user_id'=>$this->user_id])->field('id,device_id,device_title')->page($page,$pagesize)->select();
+        foreach ($res as $k=>$v){
+            $macno = Db::name('device')->where(['device_id'=>$v['device_id']])->value('macno');
+            $res[$k]['macno'] = $macno?$macno:'';
+        }
+        $this->_return(1,'获取成功',$res);
+    }
+
+
+    //点击收藏
+    public function getFavorite(){
+        if (!$_POST['device_id']) $this->_return(-1,'缺少参数');
+        $deviceInfo = Db::name('device')->where(['device_id'=>$_POST['device_id']])->find();
+        if (!$deviceInfo) $this->_return(-1,'设备不存在');
+        $favorite = Db::name('favorite')->where(['user_id'=>$this->user_id,'device_id'=>$_POST['device_id']])->find();
+        if ($favorite) $this->_return(-1,'已经收藏，不需要再次收藏');
+        $favoriteData = array(
+            'user_id'   =>  $this->user_id,
+            'device_id' =>  $_POST['device_id'],
+            'device_title'  =>  $deviceInfo['title'],
+            'ctime'     =>  time()
+        );
+        $res = Db::name('favorite')->insert($favoriteData);
+        if (!$res) $this->_return(-1,'收藏失败');
+        $this->_return(1,'收藏成功');
+    }
+
+    //取消收藏
+    public function delFavorite(){
+        if (!$_POST['favorite_id']) $this->_return(-1,'缺少参数');
+        $favorite = Db::name('favorite')->where(['id'=>$_POST['favorite_id']])->find();
+        if (!$favorite) $this->_return(-1,'此条收藏不存在');
+        $res = Db::name('favorite')->where(['id'=>$_POST['favorite_id']])->delete();
+        if (!$res) $this->_return(-1,'取消失败');
+        $this->_return(1,'取消成功');
+    }
+
+
+    //合作加盟
+    public function cooperation(){
+        if (!$_POST['user_name'] || !$_POST['user_phone']|| !$_POST['content']) $this->_return(-1,'缺少参数');
+        if(!($this->check_mobile($_POST['user_phone']))){
+            $this->_return(-1,'手机号码格式不正确！！');
+        }
+        $coopData = array(
+            'user_name'     =>  $_POST['user_name'],
+            'user_phone'    =>  $_POST['user_phone'],
+            'content'    =>  $_POST['content'],
+            'ctime'         =>  time(),
+            'user_id'       =>  $this->user_id
+        );
+        $res = Db::name('cooperation')->insert($coopData);
+        if (!$res) $this->_return(-1,'操作失败');
+        $this->_return(1,'操作成功');
+    }
+
+    //提交反馈意见
+    public function feedback(){
+        if (!$_POST['content'] || !$_POST['phone']|| !$_POST['order_no']) $this->_return(-1,'缺少参数');
+        if ($_POST['img_url']){
+             $url = $_POST['img_url'];
+        }else{
+            if($_FILES['cover']){
+                $url = $this->upload('cover',2);
+            }
+
+//            else{
+//                $this->_return(-1,'图片不能为空');
+//            }
+        }
+        if(!($this->check_mobile($_POST['phone']))){
+            $this->_return(-1,'手机号码格式不正确！！');
+        }
+        $find=db('feedback')->where(array('order_no'=>$_POST['order_no'],'user_id'=>$this->user_id))->find();
+        if($find){
+            $this->_return(-1,'已经反馈了，请等待处理！！');
+        }
+
+        $feedbackData = array(
+            'user_id'   =>  $this->user_id,
+            'content'   =>  $_POST['content'],
+            'phone'     =>  $_POST['phone'],
+            'img'       =>  $url,
+            'ctime'     =>  time(),
+            'order_no'     =>  $_POST['order_no']
+        );
+
+
+        $res = Db::name('feedback')->insert($feedbackData);
+        if (!$res) $this->_return(-1,'反馈信息存入失败');
+        $this->_return(1,'操作成功');
+
+    }
+
+    //反馈记录(列表)
+    public function feedbackLog(){
+        $page = $_POST['page']?$_POST['page']:1; //页码
+        $pagesize = $_POST['pagesize']?$_POST['pagesize']:10; //每页条数
+        $res = Db::name('feedback')->where(['user_id'=>$this->user_id])->order('id desc')->page($page,$pagesize)->select();
+        foreach ($res as $k=>$v){
+            if (substr($v['img'],-1)==','){
+                $img = substr($v['img'],0,strlen($v['img'])-1);
+            }else{
+                $img = $v['img'];
+            }
+
+            $res[$k]['img'] = explode(',',str_replace('/uploads',$this->appUrl.'/uploads',$img));
+
+        }
+        if (!$res) $this->_return(1,'获取成功');
+        $this->_return(1,'获取成功',$res);
+    }
+
+
+    //反馈详情
+    public function feedbackDetail(){
+        if (!$_POST['feedback_id']) $this->_return(-1,'缺少参数');
+        $res = Db::name('feedback')->where(['id'=>$_POST['feedback_id']])->find();
+        if (!$res) $this->_return(-1,'未找到此条反馈信息');
+        $img = substr($res['img'],0,strlen($res['img'])-1);
+        $res['img'] = explode(',',str_replace('/uploads',$this->appUrl.'/uploads',$img));
+        if(empty($res['dispose_content'])){
+            $res['dispose_content']='';
+        }
+        $res['ctime']=date('Y-m-d H:i:s',$res['ctime']);
+        if(!empty($res['dispose_time'])){
+            $res['dispose_time']=  date('Y-m-d H:i:s',$res['dispose_time']);
+        }
+        $this->_return(1,'获取成功',$res);
+    }
+    public function uploadImg(){
+        // 获取表单上传文件
+        $files = $this->request->file('image');
+        if (!$files) {
+            $this->_return(-1,'未上传图片');
+        }
+        foreach($files as $file){
+            // 移动到框架应用根目录/public/uploads/ 目录下
+            $info = $file->validate(['ext'=>'jpg,png,gif,jpeg'])->move(ROOT_PATH . 'public' . DS . 'uploads');
+            if ($info) {
+
+                $data['url'] = $this->appUrl.'/uploads/'.date("Ymd") .'/'.$info->getFilename();
+                $data['path'] = '/public/uploads/'.date("Ymd") .'/'.$info->getFilename();
+                $this->_return(1,'上传成功',$data);
+            } else {
+                // 上传失败获取错误信息
+                $this->_return(-1,$file->getError());
+            }
+        }
+//        model('File')->saveAll($data);
+    }
+    /*
+     * 我的钱包
+     */
+    public function myMoney(){
+       $money= db('user')->where('user_id',$this->user_id)->value('money');
+        $this->_return(1,'获取成功',$money);
+    }
+
+    //发送验证码
+    public function sendSmsCaptcha(){
+
+        $phone = input('param.phone')?:$this->_return(-1,'手机号不能为空！');
+        $type = input('param.type')?:$this->_return(-1,'参数类型不能为空！');
+        if (!($this->check_mobile($phone))) {
+            $this->_return(-1,'手机号码格式有误！');
+//            return json(['data' => [], 'msg' => '手机号码格式有误', 'code' => 0]);
+        }
+//        try {
+//            $uuid1 = Uuid::uuid4();
+//            $uuid = $uuid1->toString();
+//        } catch (UnsatisfiedDependencyException $e) {
+//            echo 'Caught exception: ' . $e->getMessage() . "\n";
+//        }
+        $code = mt_rand(100000, 999999);
+        if($type == 1){
+            $post['type'] = 1;
+            $content = '【小豆丁售货柜】您的登录验证码'.$code.',如非本人操作，请忽略本短信!';
+        }else if($type == 2){
+            $post['type'] = 2;
+            $content = '【小豆丁售货柜】您的绑定验证码'.$code.',如非本人操作，请忽略本短信!';
+        }else{
+            $this->_return(-1,'类型错误！');
+        }
+
+        $result = zt_sms_send($phone,$code,$content);
+//        print_r($result);
+        $re_status = explode(',',$result);
+        if($re_status[0] != 1){
+            $this->_return(-1,'短信发送失败！');
+//            return json(['data' => false, 'msg' => '短信发送失败', 'code' => 0]);
+        }else{
+            $data = ['mobile'=>$phone,'code'=>$code,'ctime'=>time(),'type'=>$type];
+            if(Db::name('sms_verify')->where(['mobile'=>  $phone])->find()) {
+                Db::name('sms_verify')->where(['mobile'=>  $phone])->update($data);
+            } else {
+                Db::name('sms_verify')->insertGetId($data);
+            }
+            $this->_return(1,'短信发送成功！',$phone);
+//            return json(['data' => [], 'msg' => '发送成功', 'code' => 1]);
+
+        }
+    }
+    //充值套餐列表
+    public function meallist(){
+       $shop_id= input('shop_id');
+       if($shop_id){
+           $where['shop_id']=$shop_id;
+       }
+        $page= input('page')?:1;
+        $size= input('page')?:20;
+        $list=db('regulation')->where($where)->page($page,$size)->select();
+        $this->_return(1,'获取成功',$list);
+    }
+    //生成套餐订单支付订单
+    public function  rechargemeal(){
+        $regulation_id= input('regulation_id');
+        $shop_id= input('shop_id');
+        $pay_type= input('pay_type')?:1;
+        if(empty($regulation_id)){
+            $this->_return(-1,'套餐id不能为空',$regulation_id);
+        }
+        if(empty($shop_id)){
+            $this->_return(-1,'商家id不能为空',$shop_id);
+        }
+        $find=  db('shop_wxset')->where('shop_id',$shop_id)->find();
+        if(empty($find)){
+            $this->_return(-1,'改商家为配置支付参数，不能充值',$find);
+        }
+        $regulation_find= db('regulation')->where('regulation_id',$regulation_id)->find();
+        if(empty($regulation_find)){
+            $this->_return(-1,'没有改套餐，不能充值',$regulation_find);
+        }
+//        $openid= db('user')->where('user_id',$this->user_id)->value('openid');
+               $this->user_id;
+        $user= $this->get_user_info= $this->get_user_info;
+        $data['order_number']= 'R'.date('YmdHis').mt_rand(1000,9999);
+        $data['user_id']=   $this->user_id ;
+        $data['shop_id']= $shop_id;
+        $data['pay_type']= $pay_type;
+        $data['money']=$regulation_find['money'];
+        $data['give_money']= $regulation_find['give_money'];
+        $data['status']= 1;
+        $data['ctime']= time();
+        $order_id= db('recharge')->insertGetId($data);
+        $Wxpay = new WxpayController();
+        switch ($pay_type) {
+            case '1'://微信支付
+                if($order_id){
+                    $data['money']=0.01;
+                  $this->wxpay( $data['order_number'],$regulation_find['money'],$user['openid']);
+                }else{
+
+                    $this->_return(-1,'订单提交支付失败',(object)array());
+                }
+                break;
+            case '2'://支付宝支付
+//                $result = Db::name('order')->where(['order_id'=>$order_id,'status'=>2])->update($data);
+//                if($result !== false){
+//                    if($data['pay_price'] == 0){
+//                        $res = $Wxpay->payReturn($order['order_number'],'',3);
+//                        if($res){
+//                            $this->_return(1,'支付成功',(object)array());
+//                        }else{
+//                            $this->_return(-1,'支付失败',(object)array());
+//                        }
+//                    }else{
+//                        $data['pay_price'] = 0.01;
+//                        $data['body'] = '支付宝消费订单'.$order['order_number'];
+//                        $data['out_trade_no'] = $order['order_number'];
+//                        $data['subject'] = '支付宝付款';
+//                        $data['total_amount'] = floatval($data['pay_price']);//floatval($order_money) * 100);//总金额
+//                        $data['notify_url'] = "http://".$_SERVER['HTTP_HOST']."/wxsite/alipay/order_notify_url";
+//                        $form = model('Alipay')->alipay($data);
+//                        echo $form;
+//                    }
+//                }else{
+//                    $this->_return(-1,'订单提交支付失败',(object)array());
+//                }
+//                break;
+//            case '3'://余额支付
+//                $user = Db::name('user')->where(['user_id'=>$user_id])->find();
+//                if($user['money'] == 0){
+//                    // if($result !== false){
+//                    //     $data['pay_price'] = 0.01;
+//                    //     $data['body'] = '支付宝消费订单'.$order['order_number'];
+//                    //     $data['out_trade_no'] = $order['order_number'];
+//                    //     $data['subject'] = '支付宝付款';
+//                    //     $data['total_amount'] = floatval($data['pay_price']);//floatval($order_money) * 100);//总金额
+//                    //     $data['notify_url'] = "http://".$_SERVER['HTTP_HOST']."/wxsite/alipay/order_notify_url";
+//                    //     $form = model('Alipay')->alipay($data);
+//                    //     echo $form;
+//                    // }else{
+//                    //     $this->_return(-1,'订单提交支付失败',(object)array());
+//                    // }
+//                    $this->_return(2,'余额不足，请用户支付宝支付！',(object)array());
+//                }else{
+//                    $result = Db::name('order')->where(['order_id'=>$order_id,'status'=>2])->update($data);
+//                    if($result !== false){
+//                        $res = $Wxpay->payReturn($order['order_number'],'',3);
+//                        if($res){
+//                            $this->_return(1,'支付成功',(object)array());
+//                        }else{
+//                            $this->_return(-1,'支付失败',(object)array());
+//                        }
+//                    }else{
+//                        $this->_return(-1,'订单提交支付失败',(object)array());
+//                    }
+//                }
+//                break;
+            default:
+                $this->_return(-1,'支付类型错误',(object)array());
+                break;
+        }
+    }
+
+    //我的钱包
+    public function mywallet(){
+        $page=input('page')?:1;
+        $size=input('size')?:20;
+        $list=db('user_money')->alias('a')->join('dlc_shop b','a.shop_id=b.shop_id','left')->where('a.user_id',$this->user_id)->field('a.*,b.user_name')->page($page,$size)->select();
+        $this->_return(1,'获取成功！',$list);
+    }
+    public function wxpay($order_number='',$money='' ,$openid='')
+    {
+        write_log('payReturn','调起支付1订单号$order_number='.$order_number.'----$money='.$money.'------$openid---'.$openid);
+        $paydata['openid'] = $openid;
+        $paydata['body'] = '充值套餐支付';                          // 商品描述
+        $paydata['out_trade_no'] = $order_number;                    // 订单号
+//        $paydata['out_trade_no'] = 'U201810191606233730';                    // 订单号
+        $paydata['total_fee'] = $money ;
+        $jsapiParams = \app\common\tool\WecahtOfficialAccount::getH5PayRechargeParams($paydata);
+        write_log('payReturn','$jsapiParams'.json_encode($jsapiParams,true));
+        $this->_return(1, 'ok', $jsapiParams);
+    }
+    //充值记录
+    public function rechargelog(){
+       $shop_id= input('shop_id');
+       if(empty($shop_id)){
+           $this->_return(-1, '商家id不能为空！', $shop_id);
+       }
+        $page=input('page')?:1;
+        $size=input('size')?:20;
+        $where['shop_id']=$shop_id;
+        $where['user_id']=$this->user_id;
+        $where['type']=2;
+        $list=db('cash_log')->where($where)->field('id,money,ctime')->page($page,$size)->select();
+        foreach ($list as $k=>$v){
+            $list[$k]['ctime']=date('Y-m-d H:i:s',$v['ctime']);
+        }
+        $this->_return(1, '获取成功', $list);
+    }
+
+}

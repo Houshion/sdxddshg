@@ -1,0 +1,243 @@
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">提现列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="widget-body">
+                <div class="table-toolbar">
+                    <!--<button  class="btn btn-warning" data-loader="App-loader" data-loadername="导出数据" onclick="exportExcel()">导出数据</button>-->
+                 <!--   {if condition="$_GET['type']==1"}
+                    <a href="{:url('shop/withdraw/add')}" class="btn btn-primary" data-loader="App-loader" data-loadername="申请提现">
+                    <i class="fa fa-plus"></i>申请提现
+                    </a>&nbsp;&nbsp;
+                    {else/}
+                    <a href="{:url('shop/withdraw/useradd')}" class="btn btn-primary" data-loader="App-loader" data-loadername="申请提现">
+                        <i class="fa fa-plus"></i>申请提现
+                    </a>
+                    {/if}-->
+
+                    <!--<a href="#" class="btn btn-danger" id="App-delall">-->
+                    <!--<i class="fa fa-delicious"></i>全部删除-->
+                    <!--</a>-->
+
+                    <div class="pull-right" style="padding-bottom: 10px">
+                        <form id="App-search">
+
+                            <!--用户昵称：<label style="margin-bottom: 0px;">-->
+                            <!--<input name="nickname" type="search" class="form-control input-sm" value="{$nickname}" placeholder="用户昵称">-->
+                            <!--</label>  &nbsp;&nbsp;-->
+
+
+                            <input name="type" type="hidden" class="form-control input-sm" value="1" placeholder="">
+
+
+                            提现状态：<label style="margin-bottom: 0px;">
+                            <select name="status" class="form-control select-sm">
+                                <option value="">请选择</option>
+                                {volist name="statusArr" id="vo"}
+                                <option value="{$key}" {$key==$status?'selected':''}>{$vo}</option>
+                                {/volist}
+                            </select>
+                            <!--<input name="title" type="search" class="form-control input-sm" value="" placeholder="用户类型">-->
+                        </label> &nbsp;&nbsp;
+
+                            <a href="{:url('/dlc/withdraw/index/')}" class="btn btn-success" data-loader="App-loader"
+                               data-loadername="" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                    <tr role="row">
+                        <!--<th width="30px"><div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                        <!--<label style=" padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">-->
+                        <!--<span class="text"></span>-->
+                        <!--</label>-->
+                        <!--</div></th>-->
+                        <th>ID</th>
+                        <th>姓名</th>
+                        <th>提现金额</th>
+                        <th>身份证号</th>
+                        <th>银行名称</th>
+                        <th>银行卡号</th>
+                        <th>开户支行名称</th>
+                        <th>状态</th>
+                        <th>审核账号</th>
+                        <th>申请时间</th>
+                        <th>审核时间</th>
+                        <th>操作</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {volist name="list" id="vo"}
+                    <tr>
+                        <!--<td>-->
+                        <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                        <!--<label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="">-->
+                        <!--<span class="text"></span>-->
+                        <!--</label>-->
+                        <!--</div>-->
+                        <!--</td>-->
+                        <td>{$vo['withdraw_id']}</td>
+                        <td>{$vo['user_name']}</td>
+                        <td>{$vo['money']}元</td>
+                        <td>{$vo['id_number']}</td>
+                        <td>{$vo['bank_name']}</td>
+                        <td>{$vo['bank_no']}</td>
+                        <td>{$vo['branch']}</td>
+                        <td>
+                            {if condition="$vo['status'] eq 1"}
+                            审核中
+                            {elseif condition="$vo['status'] eq 2"/}
+                            完成
+                            {/if}
+                        </td>
+                        <td>
+                            {if condition="$vo['nickname'] neq ''"}
+                            {$vo['nickname']}
+                            {else/}
+                             无
+                            {/if}
+                        </td>
+                        <td>{$vo['ctime']|date='Y-m-d H:i:s',###}</td>
+                        <td>
+                            {if condition="$vo['check_time'] eq 0"}
+                                无
+                            {else/}
+                            {$vo['check_time']|date='Y-m-d H:i:s',###}
+                            {/if}
+                        </td>
+
+                        <td>
+                            {if condition="$vo['status'] eq 1"}
+                            <button type="button" name="submit" class="btn btn-success btn-xs" data-id="{$vo.withdraw_id}"> 审核通过 </button>
+                            {elseif condition="$vo['status'] eq 2"/}
+                            <button type="button"  class="btn btn-error btn-xs"> 已完成 </button>
+                            {/if}
+                        </td>
+                        <!--<td>-->
+                        <!--<a href="{:url('/Dlc/goods/edit')}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="编辑"><i class="fa fa-edit"></i> 详情</a> &nbsp;-->
+                        <!--</td>-->
+                    </tr>
+                    {/volist}
+                    </tbody>
+                </table>
+                <div class="row DTTTFooter">
+                    {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<script>
+    $('button[name="submit"]').click(function () {
+        var withdraw_id = $(this).attr('data-id');
+        $.post("{:url('/dlc/withdraw/edit')}",{"withdraw_id":withdraw_id,"type":"{:input('type')}"},function (res) {
+            if (res.status==1){
+                $.App.alert('success',res.msg);
+                $('#refresh-toggler').click();
+            }else {
+                alert(res.msg);
+            }
+        },'json');
+    });
+
+</script>
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall = $('#App-table .App-checkall');
+    var checks = $('#App-table .App-check');
+    var trs = $('#App-table tbody tr');
+    $(checkall).on('click', function () {
+        if ($(this).is(":checked")) {
+            $(checks).prop("checked", "checked");
+        } else {
+            $(checks).removeAttr("checked");
+        }
+    });
+    $(trs).on('click', function () {
+        var c = $(this).find("input[type=checkbox]");
+        if ($(c).is(":checked")) {
+            $(c).removeAttr("checked");
+        } else {
+            $(c).prop("checked", "checked");
+        }
+    });
+    //全删
+    $('#App-delall').on('click', function () {
+        var checks = $(".App-check:checked");
+        var chk = '';
+        $(checks).each(function () {
+            chk += $(this).val() + ',';
+        });
+        if (!chk) {
+            $.App.alert('danger', '请选择要删除的项目！');
+            return false;
+        }
+        var toajax = '/Dlc/goods/clear?goods_id=' + chk;
+        var funok = function () {
+            var callok = function () {
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr = function () {
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post', toajax, 'nodata', callok, callerr);
+        }
+        $.App.confirm("确认要删除吗？", funok);
+    });
+
+    //导出数据
+    function exportExcel() {
+        $.ajax({
+            type: "post",
+            url: "{:url('dlc/recharge/exportSelect')}",
+            //data:{"outh_id":outh_id},
+            dataType: "html",
+            height: 500,
+            success: function (mb) {
+                //console.log(mb),
+                bootbox.dialog({
+                    message: mb,
+                    title: "导出筛选",
+                    buttons: {}
+                });
+            },
+            error: function (xhr) {
+                $.App.alert('danger', '通讯失败！请重试！');
+            }
+        });
+        return false;
+    }
+
+</script>
+<!--/全选特效封装-->

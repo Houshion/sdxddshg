@@ -1,0 +1,230 @@
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">设备补货列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="table-toolbar">
+
+                   <!--  <a href="{:url('/Dlc/device/index/',array('p'=>$pages))}" class="btn btn-primary" data-loader="App-loader" data-loadername="设备列表">
+                        <i class="fa fa-mail-reply"></i>返回
+                    </a> -->
+                 <!--   <a href="#" class="btn btn-danger" id="App-delall">
+                        <i class="fa fa-delicious"></i>全部删除
+                    </a>-->
+                    <div class="pull-right" style="padding-bottom: 10px">
+                        <form id="App-search">
+
+                            设备编号：
+                            <label style="margin-bottom: 0px;">
+                                <input name="macno" type="text" class="form-control input-sm" value="{$macno}" placeholder='设备编号'>
+                            </label>  &nbsp;&nbsp;
+                             补货编号：
+                            <label style="margin-bottom: 0px;">
+                                <input name="order_number" type="text" class="form-control input-sm" value="{$order_number}" placeholder='补货编号'>
+                            </label>  &nbsp;&nbsp;
+                            补货员：
+                            <label style="margin-bottom: 0px;">
+                                <input name="username" type="text" class="form-control input-sm" value="{$username}" placeholder='补货员'>
+                            </label>  &nbsp;&nbsp;
+                            补货状态:
+                            <label style="margin-bottom: 0px;">
+                               <select name='status'>
+                                   <option value="">请选择</option>
+                                   <option value="1"{if condition="$status eq '1'"} selected{/if}>开门中</option>
+                                   <option value="2"{if condition="$status eq '2'"} selected{/if}>未确认</option>
+                                   <option value="3"{if condition="$status eq '3'"} selected{/if}>已补货</option>
+                               </select>
+                            </label>  &nbsp;&nbsp;
+                            <!--补货类型:-->
+                            <!--<label style="margin-bottom: 0px;">-->
+                               <!--<select name='staff_type'>-->
+                                   <!--<option value="">请选择</option>-->
+                                   <!--<option value="1"{if condition="$staff_type eq '1'"} selected{/if}>员工</option>-->
+                                   <!--<option value="2"{if condition="$staff_type eq '2'"} selected{/if}>商家</option>-->
+                               <!--</select>-->
+                            <!--</label>  &nbsp;&nbsp;-->
+                           <!--  设备编号：
+                            <label style="margin-bottom: 0px;">
+                                <input name="macno" type="text" class="form-control input-sm" value="{$macno}" placeholder="设备编号">
+                            </label>  &nbsp;&nbsp;
+                            设备地址：
+                            <label style="margin-bottom: 0px;">
+                                <input name="address" type="text" class="form-control input-sm" value="{$address}" placeholder="设备地址">
+                            </label>  &nbsp;&nbsp; -->
+                            <a href="{:url('/shop/device/replenishment/')}" class="btn btn-success" data-loader="App-loader" data-loadername="设备补货列表" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                        <tr role="row">
+                            <!--<th width="30px">-->
+                                <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                                    <!--<label style="padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">-->
+                                     <!--<span class="text"></span>-->
+                                    <!--</label>                                    -->
+                                <!--</div>-->
+                            <!--</th>-->
+                            <th>ID</th>
+                            <th>补货编号</th>
+                            <th>设备名称</th>
+                            <th>设备编号</th>
+
+                            <th>补货人员</th>
+                            <th>补货信息</th>
+                            <th>补货状态</th>
+                            <th>补货类型</th>
+                            <th>开门时间</th>
+                            <th>关门时间</th>
+                            <th>创建时间</th>
+                            <!-- <th>支付时间</th> -->
+                       <!--     <th>操作</th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {volist name="result" id="vo" empty= "$empty"}
+                            <tr id="item{$vo.order_id}">
+                                <!--<td >-->
+                                    <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                                        <!--<label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.order_id}">-->
+                                         <!--<span class="text"></span>-->
+                                        <!--</label>                                    -->
+                                    <!--</div>-->
+                                <!--</td>-->
+                                <td class=" sorting_1" width="30px">{$vo.order_id}</td>
+                                <td class=" ">{$vo.order_number}</td>
+                                <td class=" ">{$vo.title}</td>
+                                <td class=" ">{$vo.macno}</td>
+                                <!--<td class=" ">-->
+                                    <!--{if condition="$vo.shop_id eq '-1'"}-->
+                                        <!--所属平台-->
+                                    <!--{else/}-->
+                                        <!--{$vo.user_name}-->
+                                    <!--{/if}-->
+                                <!--</td>-->
+                                <td class=" ">
+                                    {if condition="$vo.staff_type eq '1'"}
+                                        {$vo.username}
+                                    {else/}
+                                        {$vo.user_name}
+                                    {/if}
+                                </td>
+                               
+                                <td class=" ">
+                                    {volist name="vo.goods" id="v"}
+                                        <b>{$v.title} X {$v.num} 单价:¥{$v.price}</b><br/>
+                                    {/volist}
+                                </td>
+                                <td class=" ">
+                                   {eq name='vo.status' value='1'} 开门中 {/eq}
+                                   {eq name='vo.status' value='2'} 未确认 {/eq}
+                                   {eq name='vo.status' value='3'} 已补货 {/eq}
+                                </td>
+                                <td class=" ">
+                                   {eq name='vo.staff_type' value='1'} 员工 {/eq}
+                                   {eq name='vo.staff_type' value='2'} 商家 {/eq}
+                                </td>
+                                <td class=" ">
+                                    {if condition="$vo.open_time neq  0"}
+                                        {$vo.open_time|date='Y-m-d H:i:s',###}
+                                    {else/}
+                                        暂无
+                                    {/if}
+                                </td>
+                                <td class=" ">
+                                    {if condition="$vo.close_time neq  0"}
+                                        {$vo.close_time|date='Y-m-d H:i:s',###}
+                                    {else/}
+                                        暂无
+                                    {/if}
+                                </td>
+                                <td class=" ">{$vo.ctime|date='Y-m-d H:i:s',###}</td>
+                        <!--        <td class="center ">
+                                   <a href="{:url('Dlc/device/replenishmentDel',array('id'=>$vo['order_id']))}" class="btn btn-danger btn-xs" data-type = "del" data-ajax="{:url('Dlc/device/replenishmentDel',array('id'=>$vo['order_id']))}"><i class="fa fa-trash-o"></i> 删除</a>
+                                </td>-->
+                            </tr>
+                        {/volist}
+                                                
+                    </tbody>
+                    
+                </table>
+                 <!-- style="line-height: 32px; height: 32px;" -->
+                <div class="row DTTTFooter">
+                {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){         
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }       
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }       
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        // var toajax="{:url('/Dlc/device/replenishmentDel')}"+"/id/"+chk;
+        var toajax='/Dlc/device/replenishmentDel?id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }                       
+        $.App.confirm("确认要删除吗？",funok);
+    });
+</script>
+<!--/全选特效封装-->

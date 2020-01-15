@@ -1,0 +1,631 @@
+<div class="row">
+    <div class="col-lg-4 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed databox-graded">
+            <div class="databox-left bg-azure">
+                <div class="databox-piechart">
+                    <div data-toggle="easypiechart" class="easyPieChart" data-barcolor="#fff" data-linecap="butt" data-percent="{$newviptotalrate}" data-animate="500" data-linewidth="3" data-size="60" data-trackcolor="#7fe2fa"><span class="white font-90">{$newviptotalrate}%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="databox-right">
+                <span class="databox-number azure">今日：{$newvipToday}&nbsp;&nbsp;昨日：{$newvipYesterday}</span>
+                <div class="databox-text darkgray">{if condition="$type eq 1"}新增员工 {else} 新增补货 {/if}
+                    <div class="databox-stat bg-azure radius-bordered">
+                        <div class="stat-text">环比：{$newviprate}%</div>
+                        <gt name="newviprate" value="0">
+                            <i class="stat-icon fa fa-arrow-up"></i>
+                            <else/>
+                            <i class="stat-icon fa fa-arrow-down"></i>
+                        </gt>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="databox databox-xlg radius-bordered databox-shadowed databox-vertical">
+            <div class="databox-top bg-blue">
+                <span class="databox-header">{if condition="$type eq 1"}员工分布 {else} 补货分布 {/if}【总数：{$viptotal}{if condition="$type eq 1"}人 {else/} 件{/if}】</span>
+            </div>
+            <div class="databox-bottom bg-white no-padding" style=" height: 230px;">
+                <div id="vip-chart" class="chart chart"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed databox-graded">
+            <div class="databox-left bg-orange">
+                <div class="databox-piechart">
+                    <div data-toggle="easypiechart" class="easyPieChart" data-barcolor="#fff" data-linecap="butt" data-percent="{$newordertotalrate}" data-animate="500" data-linewidth="3" data-size="60" data-trackcolor="#fa8872"><span class="white font-90">{$newordertotalrate}%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="databox-right">
+                <span class="databox-number orange">今日：{$neworderToday}&nbsp;&nbsp;昨日：{$neworderYesterday}</span>
+                <div class="databox-text darkgray">新增订单
+                    <div class="databox-stat bg-orange radius-bordered">
+                        <div class="stat-text">环比：{$neworderrate}%</div>
+                        <gt name="neworderrate" value="0">
+                            <i class="stat-icon fa fa-arrow-up"></i>
+                            <else/>
+                            <i class="stat-icon fa fa-arrow-down"></i>
+                        </gt>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="databox databox-xlg radius-bordered databox-shadowed databox-vertical">
+            <div class="databox-top bg-orange">
+                <span class="databox-header">订单分布【总数：{$ordertotal}个】</span>
+            </div>
+            <div class="databox-bottom bg-white no-padding" style=" height: 230px;">
+                <div id="order-chart" class="chart chart"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-sm-6 col-xs-12">
+        <div class="databox databox-lg radius-bordered databox-shadowed databox-graded">
+            <div class="databox-left bg-palegreen">
+                <div class="databox-piechart">
+                    <div data-toggle="easypiechart" class="easyPieChart" data-barcolor="#fff" data-linecap="butt" data-percent="{$yjtotalrate}" data-animate="500" data-linewidth="3" data-size="60" data-trackcolor="#aadc95"><span class="white font-90">{$yjtotalrate}%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="databox-right">
+                <span class="databox-number green">今日：{$yjToday}&nbsp;&nbsp;昨日：{$yjYesterday}</span>
+                <div class="databox-text darkgray">新增设备
+                    <div class="databox-stat bg-palegreen radius-bordered">
+                        <div class="stat-text">环比：{$yjrate}%</div>
+                        <gt name="yjrate" value="0">
+                            <i class="stat-icon fa fa-arrow-up"></i>
+                            <else/>
+                            <i class="stat-icon fa fa-arrow-down"></i>
+                        </gt>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="databox databox-xlg radius-bordered databox-shadowed databox-vertical">
+            <div class="databox-top bg-palegreen">
+                <span class="databox-header">设备分布【总数：{$yjtotal}台】</span>
+            </div>
+            <div class="databox-bottom bg-white no-padding" style=" height: 230px;">
+                <div id="fx-chart" class="chart chart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="clear: both;"></div>
+<div class="row" style="margin-top: 80px;">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="dashboard-box">
+                    <!-- <div class="box-header">
+                        <div class="deadline">
+                            系统运行: {$remaindays}&nbsp;天
+                        </div>
+                    </div> -->
+                    <div class="box-progress">
+                       <!--  <div class="progress-handle">{$_SESSION.CMS.set.name}</div> -->
+                        <div class="progress progress-xs progress-no-radius bg-whitesmoke">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-tabbs">
+                        <div class="tabbable">
+                            <ul class="nav nav-tabs tabs-flat  nav-justified" id="myTab11">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#viplog">
+                                                                订单日志
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#orderlog">
+                                                                支付日志
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#fxlog">
+                                                                设备补货日志
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#tjlog">
+                                                                设备消息日志
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content tabs-flat no-padding">
+                                <div id="viplog" class="tab-pane animated fadeInUp active">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="chart no-margin" style="height: 326px;">
+                                                <div class="tickets-container" style="background: #FFFFFF;">
+                                                    <ul class="tickets-list">
+                                                        {if condition="$order"}
+                                                            {volist name="order" id="vo"}
+                                                                <li class="ticket-item">
+                                                                    <div class="row">
+                                                                        <div class="ticket-user col-lg-4 col-sm-12">
+                                                                            <img src="{$vo.head_img}" class="user-avatar">
+                                                                            <span class="user-name">{$vo.name}<!-- [{eq name="vo.sex" value='1'}男 {else/} 女{/eq}] --></span>
+                                                                            <span class="user-at"> &nbsp;&nbsp;订单号：</span>
+                                                                            <span class="user-company">{$vo.order_number}</span>
+                                                                        </div>
+                                                                        <div class="ticket-type  col-lg-1 col-sm-1 col-xs-12">
+                                                                            <span class="divider hidden-xs"></span>
+                                                                            <span class="type">
+                                                                            	{eq name="vo.status" value='2'}未付款{/eq}
+                                                                            	{eq name="vo.status" value='3'}已付款{/eq}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="ticket-type  col-lg-4 col-sm-6 col-xs-12">
+                                                                            <span class="divider hidden-xs"></span>
+                                                                            <span class="type">&nbsp;&nbsp;&nbsp;总金额：{$vo.count_price}&nbsp;&nbsp;支付金额：{$vo.pay_price};</span>
+                                                                        </div>
+                                                                        <div class="ticket-time  col-lg-2 col-sm-6 col-xs-12">
+                                                                            <div class="divider hidden-md hidden-sm hidden-xs"></div>
+                                                                            <i class="fa fa-clock-o"></i>
+                                                                            <span class="time">{$vo.ctime|date="Y-m-d H:i:s",###}</span>
+                                                                        </div>
+                                                                        <eq name="vo.issub" value="1">
+                                                                            <div class="ticket-state bg-palegreen">
+                                                                                <i class="fa fa-check"></i>
+                                                                            </div>
+                                                                            <else/>
+                                                                            <div class="ticket-state bg-palegreen">
+                                                                                <i class="fa fa-check"></i>
+                                                                            </div>
+                                                                        </eq>
+                                                                    </div>
+                                                                </li>
+                                                            {/volist}
+                                                        {else/}
+                                                            <h4 style="padding-left:50%;margin-top:100px;">暂无数据！</h4>
+                                                        {/if}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="orderlog" class="tab-pane padding-left-5 padding-right-10 animated fadeInUp">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="chart no-margin" style="width: 100%; padding: 0px; position: relative;">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="chart no-margin" style="height: 326px;">
+                                                            <div class="tickets-container" style="background: #FFFFFF;">
+                                                                <ul class="tickets-list">
+                                                                    {if condition="$orderlog"}
+                                                                        {volist name="orderlog" id="vo"}
+                                                                            <li class="ticket-item">
+                                                                                <div class="row">
+                                                                                    <div class="ticket-user col-lg-4 col-sm-12">
+                                                                                        <img src="{$vo.head_img}" class="user-avatar">
+                                                                                        <span class="user-name">{$vo.username}<!-- [{eq name="vo.sex" value='1'}男 {else/} 女{/eq}] --></span>
+                                                                                        <span class="user-at">手机</span>
+                                                                                        <span class="user-company"><if condition="$vo.mobile eq ''">
+                                                                                        未绑定手机
+                                                                                        <else/>
+                                                                                        {$vo.mobile}
+                                                                                        </if></span>
+                                                                                    </div>
+                                                                                    <div class="ticket-type  col-lg-2 col-sm-3 col-xs-12">
+                                                                                        <span class="divider hidden-xs"></span>
+                                                                                        <span class="type">
+                                                                                        	{switch name="vo.pay_type"}
+    														                                    {case value="1"}微信支付{/case}
+    														                                    {case value="2"}支付宝支付{/case}
+    														                                    {case value="3"}余额支付{/case}
+    														                                {/switch} -{$vo.ctime|date="Y-m-d H:i:s",###}
+    														                            </span>
+                                                                                    </div>
+                                                                                    <div class="ticket-type  col-lg-4 col-sm-6 col-xs-12">
+                                                                                        <span class="divider hidden-xs"></span>
+                                                                                        <span class="type">
+                                                                                        	{eq name="vo.type" value="1"}订单消费【实付金额：{$vo.money}】{/eq}
+                                                                                        	{eq name="vo.type" value="2"}充值【实付金额：{$vo.money}】{/eq}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div class="ticket-time  col-lg-2 col-sm-6 col-xs-12">
+                                                                                        <div class="divider hidden-md hidden-sm hidden-xs"></div>
+                                                                                        <i class="fa fa-clock-o"></i>
+                                                                                        <span class="time">{$vo.ctime|date="Y-m-d H:i:s",###}</span>
+                                                                                    </div>
+                                                                                    <div class="ticket-state bg-palegreen">
+                                                                                        <i class="fa fa-check"></i>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </li>
+                                                                        {/volist}
+                                                                    {else/}
+                                                                        <h4 style="padding-left:50%;margin-top:100px;">暂无数据！</h4>
+                                                                    {/if}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="fxlog" class="tab-pane padding-10 animated fadeInUp">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="chart no-margin" style="width: 100%; padding: 0px; position: relative;">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="chart no-margin" style="height: 326px;">
+                                                            <div class="tickets-container" style="background: #FFFFFF;">
+                                                                <ul class="tickets-list">
+                                                                    {if condition="$fxlog"}
+                                                                        {volist name="fxlog" id="vo"}
+                                                                            <li class="ticket-item">
+                                                                                <div class="row">
+                                                                                    <div class="ticket-user col-lg-4 col-sm-12">
+                                                                                        <!-- <img src="{$vo.headimgurl}" class="user-avatar"> -->
+                                                                                        <span class="user-name">
+                                                                                        	{eq name="vo.staff_type" value='1'}员工补货 {else/} 商家补货{/eq}
+                                                                                    	</span>
+                                                                                        <span class="user-at"></span>
+                                                                                        <span class="user-company">{$vo.order_number}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div class="ticket-type  col-lg-1 col-sm-1 col-xs-12">
+                                                                                        <span class="divider hidden-xs"></span>
+                                                                                        <span class="type">设备补货</span>
+                                                                                    </div>
+                                                                                    <div class="ticket-type  col-lg-4 col-sm-6 col-xs-12">
+                                                                                        <span class="divider hidden-xs"></span>
+                                                                                        <span class="type">补货数量：{$vo.num}</span>
+                                                                                    </div>
+                                                                                    <div class="ticket-time  col-lg-2 col-sm-6 col-xs-12">
+                                                                                        <div class="divider hidden-md hidden-sm hidden-xs"></div>
+                                                                                        <i class="fa fa-clock-o"></i>
+                                                                                        <span class="time">{$vo.ctime|date="Y-m-d H:i:s",###}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </li>
+                                                                        {/volist}
+                                                                    {else/}
+                                                                        <h4 style="padding-left:50%;margin-top:100px;">暂无数据！</h4>
+                                                                    {/if}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="tjlog" class="tab-pane animated fadeInUp no-padding-bottom " style="padding:20px 20px 0 20px;">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="chart no-margin" style="width: 100%; padding: 0px; position: relative;">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="chart no-margin" style="height: 326px;">
+                                                            <div class="tickets-container" style="background: #FFFFFF;">
+                                                                <ul class="tickets-list">
+                                                                    {if condition="$tjlog"}
+                                                                        {volist name="tjlog" id="vo"}
+                                                                            <li class="ticket-item">
+                                                                                <div class="row">
+                                                                                    <div class="ticket-user col-lg-4 col-sm-12">
+                                                                                        <!-- <img src="{$vo.headimgurl}" class="user-avatar"> -->设备号：
+                                                                                        <span class="user-name">{$vo.macno}</span>
+                                                                                        <!-- <span class="user-at">下线</span> -->
+                                                                                        <span class="user-company">联系手机:{$vo.mobile}</span>
+                                                                                    </div>
+                                                                                    <div class="ticket-type  col-lg-1 col-sm-1 col-xs-12">
+                                                                                        <span class="divider hidden-xs"></span>
+                                                                                        <span class="type">
+                                                                                        	设备故障信息
+                                                                                    	</span>
+                                                                                    </div>
+                                                                                    <div class="ticket-type  col-lg-4 col-sm-6 col-xs-12">
+                                                                                        <span class="divider hidden-xs"></span>
+                                                                                        <span class="type">故障内容：{$vo.content}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div class="ticket-time  col-lg-2 col-sm-6 col-xs-12">
+                                                                                        <div class="divider hidden-md hidden-sm hidden-xs"></div>
+                                                                                        <i class="fa fa-clock-o"></i>
+                                                                                        <span class="time">{$vo.ctime|date="Y-m-d H:i:s",###}</span>
+                                                                                    </div>
+                                                                                    <div class="ticket-state bg-palegreen">
+                                                                                        <i class="fa fa-check"></i>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </li>
+                                                                        {/volist}
+                                                                    {else/}
+                                                                        <h4 style="padding-left:50%;margin-top:100px;">暂无数据！</h4>
+                                                                    {/if}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-days">
+                        <div class="row">
+                            <div class=" col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                <span class="day-container">
+                                 <a href="{:url('shop/order/index')}" data-loader="App-loader" data-loadername="订单列表">
+                                    <div class="day">{$ordertotal}</div>
+                                    <div class="month">订单总数</div>
+                                    <b class="day-pin"></b>
+                                </a>
+                                </span>
+                            </div>
+                            <div class=" col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                <span class="day-container">
+                               <a href="{:url('shop/order/index')}" data-loader="App-loader" data-loadername="订单列表">
+                                    <div class="day">{$zxl}</div>
+                                    <div class="month">总销量</div>
+                                </a>
+                               </span>
+                            </div>
+                            <div class=" col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                <span class="day-container">
+                               <a href="{:url('shop/order/index')}" data-loader="App-loader" data-loadername="订单列表">
+                                    <div class="day">${$zxse}</div>
+                                    <div class="month">总销售额</div>
+                                </a>
+                              </span>
+                            </div>
+                            <div class=" col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                <span class="day-container">
+                                <a href="{:url('shop/order/index')}" data-loader="App-loader" data-loadername="订单列表">
+                                    <div class="day">${$zcje}</div>
+                                    <div class="month">总成交额</div>
+                                </a>
+                                </span>
+                            </div>
+                            <div class=" col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                <span class="day-container">
+                                 <a href="{:url('shop/device/index')}" data-loader="App-loader" data-loadername="设备列表">
+                                    <div class="day">{$zyj}</div>
+                                    <div class="month">总设备</div>
+                                </a>
+                              </span>
+                            </div>
+                            <div class=" col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                <span class="day-container">
+                                <a href="{:url('shop/user/staff')}" data-loader="App-loader" >
+                                    <div class="day">{$ztx}</div>
+                                    <div class="month">总员工</div>
+                                </a>
+                               </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<div class="row">
+    <div class="col-xs-12 col-md-6 col-lg-6">
+        <div class="widget">
+            <div class="widget-header ">
+                <span class="widget-caption">系统状态</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-6 col-lg-6">
+        <div class="widget">
+            <div class="widget-header ">
+                <span class="widget-caption">销量统计</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                
+            </div>
+        </div>
+    </div>
+
+</div>-->
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--图表特性封装-->
+<script type="text/javascript">
+InitiateEasyPieChart.init();
+</script>
+<!--图表逻辑-->
+<script type="text/javascript">
+themeprimary = getThemeColorFromCss('themeprimary');
+themesecondary = getThemeColorFromCss('themesecondary');
+themethirdcolor = getThemeColorFromCss('themethirdcolor');
+themefourthcolor = getThemeColorFromCss('themefourthcolor');
+themefifthcolor = getThemeColorFromCss('themefifthcolor');
+themesixthcolor = '#AC193D';
+themeseventhcolor = '#001940';
+
+function labelFormatter(label, series) {
+        return "<div style='font-size:8pt; text-align:center; padding:2px; color:white;'>" + label + "<br/>" + Math.round(series.percent) + "%</div>";
+    }
+ //会员
+var vip1 = "{$vipsub}"; //已关注
+var vip2 = "{$vipdissub}"; //未关注
+var vipwrap = $("#vip-chart");
+var type    = {$type};
+var vipdata = [{
+    label: type==1 ? "未绑定设备" :"已补货",
+    data: [
+        [1, vip1]
+    ],
+    color: themefifthcolor
+}, { 
+    label: type==1 ? "已绑定设备" : "未确认补货",
+    data: [
+        [1, vip2]
+    ],
+    color: themeprimary
+}];
+
+$.plot(vipwrap, vipdata, {
+    series: {
+        pie: {
+            show: true,
+            radius: 1,
+            tilt: 0.5,
+            label: {
+                show: true,
+                radius: 1,
+                formatter: labelFormatter,
+                background: {
+                    opacity: 0.8
+                }
+            },
+            combine: {
+                color: "#999",
+                threshold: 0.1
+            }
+        }
+    },
+    legend: {
+        show: false
+    }
+});
+//订单分布
+var order1 = "{$order1}"; //未完成
+var order2 = "{$order2}"; //待付款
+var order3 = "{$order3}"; //已完成
+var order4 = "{$order4}"; //已付款
+var orderwrap = $("#order-chart");
+var orderdata = [ {
+    label: "未完成",
+    data: [
+        [1, order1]
+    ],
+    color: themesecondary
+}, {
+    label: "待付款",
+    data: [
+        [1, order2]
+    ],
+    color: themethirdcolor
+}, {
+    label: "已完成",
+    data: [
+        [1, order3]
+    ],
+    color: themefourthcolor
+}, {
+    label: "已付款",
+    data: [
+        [1, order4]
+    ],
+    color: themefifthcolor
+}];
+
+$.plot(orderwrap, orderdata, {
+    series: {
+        pie: {
+            show: true,
+            radius: 1,
+            tilt: 0.5,
+            label: {
+                show: true,
+                radius: 1,
+                formatter: labelFormatter,
+                background: {
+                    opacity: 0.8
+                }
+            },
+            combine: {
+                color: "#999",
+                threshold: 0.1
+            }
+        }
+    },
+    legend: {
+        show: false
+    }
+});
+
+//分销分布
+var fx1 = "{$fx1}"; //花粉
+var fx2 = "{$fx2}"; //花蜜
+var fx3 = "{$fx3}"; //花股
+var fxwrap = $("#fx-chart");
+var fxdata = [{
+    label:  "正常",
+    data: [
+        [1, fx1]
+    ],
+    color: themeprimary
+}, {
+    label:  "异常" ,
+    data: [
+        [1, fx2]
+    ],
+    color: themesecondary
+}
+];
+
+$.plot(fxwrap, fxdata, {
+    series: {
+        pie: {
+            show: true,
+            radius: 1,
+            tilt: 0.5,
+            label: {
+                show: true,
+                radius: 1,
+                formatter: labelFormatter,
+                background: {
+                    opacity: 0.8
+                }
+            },
+            combine: {
+                color: "#999",
+                threshold: 0.1
+            }
+        }
+    },
+    legend: {
+        show: false
+    }
+});
+</script>

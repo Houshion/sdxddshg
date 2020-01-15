@@ -1,0 +1,205 @@
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">设备列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="table-toolbar">
+                        <a href="{:url('shop/Admin/adminList')}" class="btn btn-primary" data-loader="App-loader" data-loadername="管理员信息">
+                         <i class="fa fa-mail-reply"></i>返回
+                        </a>&nbsp;&nbsp;
+                  
+                    <div class="pull-right">
+                        <form id="App-search">
+                            设备名称：
+                            <label style="margin-bottom: 0px;">
+                                <input name="type" type="hidden" class="form-control input-sm" value="{$type}" placeholder="">
+                                <input name="id" type="hidden" class="form-control input-sm" value="{$id}" placeholder="">
+                                <input name="title" type="text" class="form-control input-sm" value="{$title}" placeholder="设备名称">
+                            </label>  &nbsp;&nbsp;
+                            设备编号：
+                            <label style="margin-bottom: 0px;">
+                                <input name="macno" type="text" class="form-control input-sm" value="{$macno}" placeholder="设备编号">
+                            </label>  &nbsp;&nbsp;
+                            设备地址：
+                            <label style="margin-bottom: 0px;">
+                                <input name="address" type="text" class="form-control input-sm" value="{$address}" placeholder="设备地址">
+                            </label>  &nbsp;&nbsp;
+                            设备状态:
+                            <label style="margin-bottom: 0px;">
+                               <select name='status'>
+                                   <option value="">请选择</option>
+                                   <option value="-1"{if condition="$status eq '-1'"} selected{/if}>正常</option>
+                                   <option value="1"{if condition="$status eq '1'"} selected{/if}>异常</option>
+                               </select>
+                            </label>  &nbsp;&nbsp;
+                            <a href="{:url('/shop/user/shopDevice/')}" class="btn btn-success" data-loader="App-loader" data-loadername="{$name}" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                        <tr role="row">
+                            <th width="30px">
+                                <div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+                                    <label style="padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">
+                                     <span class="text"></span>
+                                    </label>                                    
+                                </div>
+                            </th>
+                            <th>ID</th>
+                            <th>设备二维码</th>
+                            <th>设备图片</th>
+                            <th>设备名称</th>
+                            <th>设备编号</th>
+                            <!-- <th>所属商家</th> -->
+                            <th>设备地址</th>
+                            <th>设备状态</th>
+                            <th>开门次数</th>
+                            <th>销售数量</th>
+                            <th>创建时间</th>
+                            <!-- <th>操作</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {volist name="result" id="vo" empty= "$empty"}
+                            <tr id="item{$vo.device_id}">
+                                <td>
+                                    <div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+                                        <label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.device_id}">
+                                         <span class="text"></span>
+                                        </label>                                    
+                                    </div>
+                                </td>
+                                <td class=" sorting_1" width="30px">{$vo.device_id}</td>
+                                <td class=" ">
+                                    {if condition="$vo.qrcode neq ''"}
+                                        <!-- <a href="{$vo.qrcode}" target="_black"> -->
+                                            <img src="{$vo.qrcode}" style="width: 80px;height: 80px;">
+                                        <!-- </a> -->
+                                    {else}
+                                        暂无二维码
+                                    {/if}
+                                </td>
+                                <td class=" ">
+                                    {if condition="$vo.img neq ''"}
+                                        <!-- <a href="{$vo.qrcode}" target="_black"> -->
+                                            <img src="http://{$_SERVER['HTTP_HOST']}/public{$vo.img}" style="width: 80px;height: 80px;">
+                                        <!-- </a> -->
+                                    {else}
+                                        暂无图片
+                                    {/if}
+                                </td>
+                                <td class=" ">{$vo.title}</td>
+                                <td class=" ">{$vo.macno}</td>
+                               <!--  <td class=" ">
+                                    {if condition="$vo.user_name eq ''"}
+                                        所属平台
+                                    {else}
+                                        {$vo.user_name}
+                                    {/if}
+                                </td> -->
+                                <td class=" ">{$vo.address}</td>
+                                <td class=" ">{eq name="status" value='1'}<b style="color: red;">异常</b>{else/}<b style="color: green;">正常</b>{/eq}</td>
+                                <td class=" ">{$vo.open_num}</td>
+                                <td class=" ">{$vo.sales}</td>
+                                <td class=" ">{$vo.ctime|date='Y-m-d H:i:s',###}</td>
+                               <!--  <td class="center ">
+                                    <div>
+                                        <a href="{:url('Dlc/device/set',array('device_id'=>$vo['device_id'],'p'=>$p))}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="编辑设备"><i class="fa fa-edit"></i> 编辑</a>&nbsp;&nbsp;
+                                        <a href="{:url('Dlc/device/goods',array('device_id'=>$vo['device_id'],'page'=>$p))}" class="btn btn-info btn-xs" data-loader="App-loader" data-loadername="所属商品"><i class="fa fa-list"></i>所属商品</a>&nbsp;&nbsp; 
+                                        <a href="{:url('Dlc/device/order',array('device_id'=>$vo['device_id'],'page'=>$p))}" class="btn btn-warning btn-xs" data-loader="App-loader" data-loadername="设备订单"><i class="fa fa-calendar"></i>设备订单</a>&nbsp;&nbsp;
+                                    </div>
+                                    <div>
+                                        <a href="{:url('Dlc/device/del',array('device_id'=>$vo['device_id']))}" class="btn btn-danger btn-xs" data-type = "del"
+                                         data-ajax="{:url('Dlc/device/del',array('device_id'=>$vo['device_id']))}" style="margin: 10px 3px 0px 0px">
+                                            <i class="fa fa-trash-o"></i> 删除
+                                        </a> 
+                                    </div>
+                                    
+                                    
+                                </td> -->
+                            </tr>
+                        {/volist}
+                                                
+                    </tbody>
+                </table>
+                 <!-- style="line-height: 32px; height: 32px;" -->
+                <div class="row DTTTFooter">
+                {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){         
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }       
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }       
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax="{:url('/shop/device/del')}"+"/device_id/"+chk;
+        // var toajax='/Dlc/device/del?device_id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }                       
+        $.App.confirm("确认要删除吗？",funok);
+    });
+</script>
+<!--/全选特效封装-->

@@ -1,0 +1,102 @@
+<style>
+	.modal-content{height:420px;}
+</style>
+<div class="col-lg-12" style="margin-left: 10px;width: 500px; height: auto; margin-top:20px;" id="">
+	<form id="AppFormEdit" action="" method="post" class="form-horizontal" data-bv-message="" data-bv-feedbackicons-valid="glyphicon glyphicon-ok" data-bv-feedbackicons-invalid="glyphicon glyphicon-remove" data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+		<div class="form-group">
+        	<input type="hidden" class="form-control" id="oath_id" type="text" name="oath_id" value="{$parent.oath_id}" />
+         	<label class="col-lg-3 control-label">菜单上级 :<sup>*</sup></label>
+            <div class="col-lg-9">
+            <select name="parent_id" id="parent_id" class="form-control">
+            	<option value="0">一级菜单</option>
+                {volist name="roleList" id="vo"}
+                {eq name="vo.oath_id" value="$parent.parent_id"}
+                <option value="{$vo.oath_id}" selected="selected">{$vo.name}</option>
+                {else/}
+                <option value="{$vo.oath_id}">{$vo.name}</option>
+                {/eq}
+                {/volist}
+            </select>
+            </div>
+        </div>
+        <div class="form-group">
+         	<label class="col-lg-3 control-label">菜单名称 :<sup>*</sup></label>
+            <div class="col-lg-9">
+            <input class="form-control" id="name1" type="text" name="name" placeholder="菜单名或方法名" value="{$parent.name}" />
+            </div>
+        </div>
+        <div class="form-group">
+         	<label class="col-lg-3 control-label">控制器/方法 :<sup>*</sup></label>
+            <div class="col-lg-9">
+            <input class="form-control" id="url1" type="text" name="url" placeholder="控制器/方法" value="{$parent.url}" />
+            </div>
+        </div>
+        
+        <div class="form-group" {if condition="$parent.parent_id eq 0"}style = "display:"{else/} style="display:none"{/if} id="parentIcon">
+         	<label class="col-lg-3 control-label">菜单图标 :</label>
+            <div class="col-lg-9">
+            <input class="form-control" type="text" name="icon" placeholder="导航栏小图标 如Home" value="{$parent.icon}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+         	<label class="col-lg-3 control-label">菜单排序 :</label>
+            <div class="col-lg-9">
+           <input class="form-control" id="order" type="text" name="order" placeholder="排序"value="{$parent.order}" />
+            </div>
+        </div>
+		<div class="form-group">
+            <div class="col-lg-offset-2 col-lg-4">
+            <button id="pre1" style="margin-top: 5px;" class="btn btn-primary" type="submit">保存</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <button id="del1" style="margin-top: 5px;" onclick="oathDel();" class="btn btn-danger">删除</button>
+            </div>
+        </div>	
+	</form>
+</div>
+<script type="text/javascript">
+$(function(){
+	$("#parent_id").change(function(){
+		var value = $(this).val();
+		if(value == 0){
+			$("#parentIcon").show();
+		}else{
+			$("#parentIcon").hide();
+		}
+	});
+});
+$('#AppFormEdit').bootstrapValidator({
+	submitHandler: function(validator, form, submitButton) {
+		var tourl = "{:url('Dlc/role/oathSave')}";
+		var data = $('#AppFormEdit').serialize();
+		$.post(tourl, data, function(data) {
+			if (data.status) {
+				$.App.alert('success', data.msg);
+				$('.close').click();
+				$('#refresh-toggler').click();
+			} else {
+				$.App.alert('danger', data.msg);
+			}
+		})
+	},
+});
+
+function oathDel() {
+	if(confirm("确定要删除吗？")) {
+		var oath_id = $('#oath_id').val();
+		$.post('/Dlc/role/oathDel', {
+			oath_id: oath_id
+		}, function(data) {
+			if (data.status == 1) {
+				$.App.alert('success', data.msg);
+				$('.close').click();
+				$('#refresh-toggler').click();
+			} else {
+				$.App.alert('danger', data.msg);
+			}
+		})
+	} else {
+		return false;
+	}
+}   
+</script>

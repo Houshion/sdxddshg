@@ -1,0 +1,7 @@
+{volist name="cache" id="vo"}
+	<div class="imgwp" data-id = "{$vo.id}" data-src="{$vo.savepath}{$vo.savename}" data-check = "0" onclick="checkupload(this);">
+		<img src="http://gdsgshg.app.xiaozhuschool.com/public/{$vo.savepath}{$vo.savename}" />
+		<div class="cover"></div>
+	</div>	
+{/volist}
+  

@@ -1,0 +1,224 @@
+<script src="/public/datetime/moment.js"></script>
+<script src="/public/datetime/daterangepicker.js"></script>
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">商品改价记录列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+
+
+            <div class="widget-body">
+                <div class="table-toolbar">
+                   <!-- <a href="{:url('Dlc/Goods/editGoodsType')}" class="btn btn-primary" data-loader="App-loader" data-loadername="新增商品分类">
+                        <i class="fa fa-plus"></i>新增商品分类
+                    </a>&nbsp;&nbsp;
+
+                    <a href="#" class="btn btn-danger" id="App-delall">
+                        <i class="fa fa-delicious"></i>全部删除
+                    </a>
+-->
+                    <div class="pull-left" style="padding-bottom: 10px">
+                        <div  id="export_agent_order" class="btn btn-primary " data-loader="App-loader" data-loadername="导出订单">
+                            <i class="fa fa-plus"></i>导出订单
+                        </div>
+                    </div>
+                    <div class="pull-right" style="padding-bottom: 10px">
+
+                        <form id="App-search">
+
+                            <label style="margin-bottom: 0px;">
+                                <div class="col-xs-5" style="padding-left: 0px;padding-right: 0px;width: 350px">
+                                    <div class="input-group margin">
+                                        <span class="input-group-addon">日期搜索</span>
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        <input type="text" class="form-control pull-left" id="play_time" name="play_time" value="{$play_time}"/>
+                                    </div>
+                                </div>
+                            </label>
+                            商品名称：<label style="margin-bottom: 0px;">
+                            <input name="title" type="search" id="title" class="form-control input-sm" value="{$title}" placeholder="商品名称">
+                        </label>  &nbsp;&nbsp;
+                            <a href="{:url('/shop/goods/savegoodslist/')}" class="btn btn-success" data-loader="App-loader" data-loadername="" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+
+                <table id="App-table" class="table table-bordered table-hover">
+                    <thead class="bordered-darkorange">
+                    <tr role="row">
+                        <!--<th width="30px"><div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                            <!--<label style=" padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">-->
+                                <!--<span class="text"></span>-->
+                            <!--</label>-->
+                        <!--</div></th>-->
+                        <th>ID</th>
+                        <th>商品名称</th>
+                        <th>商品原成本价</th>
+                        <th>商品原售价</th>
+                        <th>商品新成本价</th>
+                        <th>商品新售价</th>
+                        <th>修改人</th>
+                        <th>时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {volist name="list" id="vo"}
+                    <tr >
+                        <!--<td>-->
+                            <!--<div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">-->
+                                <!--<label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.type_id}">-->
+                                    <!--<span class="text"></span>-->
+                                <!--</label>-->
+                            <!--</div>-->
+                        <!--</td>-->
+                        <td>{$vo.manage_id}</td>
+                        <td>{$vo.title}</td>
+                        <td>
+                            {$vo.old_cost_price}
+                        </td>
+                        <td>
+                            {$vo.old_price}
+
+                        </td>
+                        <td>
+                            {$vo.new_cost_price}
+                        </td>
+                        <td>
+                            {$vo.new_price}
+                        </td>
+                        <td>
+                            {$vo.nickname}
+                        </td>
+                        <td> {$vo.ctime|date="Y-m-d H:i:s",###}</td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                </table>
+                <div class="row DTTTFooter">
+                    {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax='/Dlc/goods/clearGoodsType?type_id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }
+        $.App.confirm("确认要删除吗？",funok);
+    });
+    $('#start_time').datetimepicker({
+        format: "yyyy-mm-dd",
+        language: "zh-CN",
+        autoclose: true,
+        minView: "month",
+        startDate: "2017-01-01 00:00",
+    }).on('changeDate',function () {
+        var start_time = $('#start_time').val();
+        $('#end_time').datetimepicker('setStartDate',start_time);
+        var endtime = $('#end_time').val();
+        if(start_time!="" && endtime!=""){
+            if(start_time>endtime){
+                $('#start_time').val('');
+                $.App.alert('danger','开始时间大于结束时间');
+                return;
+            }
+        }
+    });
+    $('#end_time').datetimepicker({
+        format: "yyyy-mm-dd",
+        language: "zh-CN",
+        autoclose: true,
+        minView: "month",
+        todayBtn: true
+    }).on('changeDate',function () {
+        var starttime = $('#start_time').val();
+        var endtime = $('#end_time').val();
+        if(starttime!="" && endtime!=""){
+            if(starttime>endtime){
+                $('#end_time').val('');
+                $.App.alert('danger','开始时间大于结束时间');
+                return;
+            }
+        }
+        $('#start_time').datetimepicker('setEndDate',endtime);
+        $('#start_time').datetimepicker('hide');
+    });
+    $('#play_time').daterangepicker({
+        showDropdowns: true,
+        locale: {
+            customRangeLabel: '自定义',
+        },
+    });
+    $("#export_agent_order").on('click',function () {
+        var play_time  = $('#play_time').val();
+        var title   = $('#title').val();
+
+//        console.log(guige);
+        window.open("{:url('shop/goods/exportgoods')}"+"?play_time="+play_time+"&title="+title);
+    });
+</script>
+<!--/全选特效封装-->

@@ -1,0 +1,320 @@
+
+<div class="row">
+    <div class="col-xs-12 col-md-12">
+        <div class="widget">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">设备列表</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <div class="table-toolbar">
+                    <a href="{:url('Dlc/device/set')}" class="btn btn-primary" data-loader="App-loader" data-loadername="新增设备">
+                        <i class="fa fa-plus"></i>新增设备
+                    </a>&nbsp;&nbsp;
+                    <a href="javascript:void(0)" id="download" class="btn btn-primary">
+                        <i class="fa fa-download"></i>批量导出二维码
+                    </a>
+                    <!--<a href="#" class="btn btn-danger" id="App-delall">-->
+                        <!--<i class="fa fa-delicious"></i>全部删除-->
+                    <!--</a>-->
+                    <div class="pull-right">
+                        <form id="App-search">
+                            设备名称：
+                            <label style="margin-bottom: 0px;">
+                                <input name="title" type="text" class="form-control input-sm" value="{$title}" placeholder="设备名称">
+                            </label>  &nbsp;&nbsp;
+                            设备编号：
+                            <label style="margin-bottom: 0px;">
+                                <input name="macno" type="text" class="form-control input-sm" value="{$macno}" placeholder="设备编号">
+                            </label>  &nbsp;&nbsp;
+                            设备地址：
+                            <label style="margin-bottom: 0px;">
+                                <input name="address" type="text" class="form-control input-sm" value="{$address}" placeholder="设备地址">
+                            </label>  &nbsp;&nbsp;
+                            所属商家:
+                            <label style="margin-bottom: 0px;">
+                               <select name='shop_id'>
+                                   <option value="">请选择</option>
+                                   <option value="-1"{if condition="$shop_id eq '-1'"} selected{/if}>平台</option>
+                                   {volist name="shop" id="v"}
+                                        <option value="{$v.shop_id}"{if condition="$shop_id eq $v.shop_id"} selected{/if}>{$v.user_name}</option>
+                                   {/volist}
+                               </select>
+                            </label>  &nbsp;&nbsp;
+                            设备状态:
+                            <label style="margin-bottom: 0px;">
+                               <select name='status'>
+                                   <option value="">请选择</option>
+                                   <option value="-1"{if condition="$status eq '-1'"} selected{/if}>正常</option>
+                                   <option value="1"{if condition="$status eq '1'"} selected{/if}>异常</option>
+                               </select>
+                            </label>  &nbsp;&nbsp;
+                            <a href="{:url('/Dlc/device/index/')}" class="btn btn-success" data-loader="App-loader" data-loadername="设备列表" data-search="App-search">
+                                <i class="fa fa-search"></i>搜索
+                            </a>
+                        </form>
+                    </div>
+                </div>
+
+                <table id="App-table" class="table table-bordered table-hover" >
+                    <thead class="bordered-darkorange">
+                        <tr role="row">
+                            <th width="30px">
+                                <div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+                                    <label style="padding-left: 4px;"> <input type="checkbox" class="App-checkall colored-blue">
+                                     <span class="text"></span>
+                                    </label>
+                                </div>
+                            </th>
+                            <th>ID</th>
+                            <th>设备二维码</th>
+                            <th>设备名称</th>
+                            <th>设备编号</th>
+                            <th>所属商家</th>
+                            <!--<th>绑定员工</th>-->
+                            <th>设备地址</th>
+                            <th>设备状态</th>
+                            <th>设备在线状态</th>
+                            <th>设备是否开门</th>
+                            <th>设备开门状态</th>
+                            <th>开门次数</th>
+                            <th>销售数量</th>
+                            <th>设备库存</th>
+                            <th>设备库存总金额</th>
+                            <th>设备销售总金额</th>
+                            <th>设备优惠总金额</th>
+                            <th>设备收入总金额</th>
+                            <!--<th>测试</th>-->
+                            <!-- <th>创建时间</th> -->
+
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {volist name="result" id="vo" empty= "$empty"}
+                            <tr id="item{$vo.device_id}">
+                                <td>
+                                    <div class="checkbox" style="margin-bottom: 0px; margin-top: 0px;">
+                                        <label style="padding-left: 4px;"> <input name="checkvalue" type="checkbox" class="colored-blue App-check" value="{$vo.device_id}">
+                                         <span class="text"></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td class=" sorting_1" width="30px">{$vo.device_id}</td>
+                                <td class=" ">
+                                    {if condition="$vo.qrcode neq ''"}
+                                            <!--<img src="{$vo.qrcode}" style="width: 80px;height: 80px;" onclick="preview('{$vo.qrcode}')"/>-->
+                             <!--<img src="{$vo.qrcode}" alt="" width="80"  onclick="preview('{$vo.qrcode}')">-->
+                                    <img src="{$vo.ss}" width="80"  onclick="preview('{$vo.ss}')">
+                                    {else}
+                                        暂无二维码
+                                    {/if}
+                                </td>
+                                <td class=" ">{$vo.title}</td>
+                                <td class=" ">{$vo.macno}</td>
+                                <td class=" ">
+                                    {if condition="$vo.user_name eq ''"}
+                                        所属平台
+                                    {else}
+                                        {$vo.user_name}
+                                    {/if}
+                                </td>
+                                 <!--<td class=" ">-->
+                                    <!--{if condition="$vo.user_id eq '0'"}-->
+                                        <!--未绑定-->
+                                    <!--{else}-->
+                                        <!--{$vo.username}-->
+                                    <!--{/if}-->
+                                <!--</td>-->
+                                <td class=" ">{$vo.address}</td>
+                                <td class=" ">{eq name="vo.status" value='1'}<b style="color: red;">{$vo.reason}</b>{else/}<b style="color: green;">正常</b>{/eq}</td>
+                                <td class="">{$vo.line}</td>
+                                <td class="">
+                                    {if condition="$vo.doorstatus eq 0"}
+                                    未开门
+                                    {elseif condition="$vo.doorstatus eq 1"/}
+                                    已开门
+                                    {else}
+                                    开门中
+                                    {/if}
+                                </td>
+                                <td class="">
+                                    {if condition="$vo.open_status eq 1"}
+                                    成功
+                                    {elseif condition="$vo.open_status eq 2"/}
+                                    失败
+                                    {else}
+                                    可使用
+                                    {/if}
+                                </td>
+                                <td class=" ">{$vo.open_num}</td>
+                                <td class=" ">{$vo.sales} 件</td>
+                                <td class=" ">{$vo.inventory} 件</td>
+                                <td class=" ">{$vo.inventoryMoney} 元</td>
+                                <td class=" ">{$vo.salesMoney} 元</td>
+                                <td class=" ">{$vo.salesDMoney} 元</td>
+                                <td class=" ">{$vo.salesPMoney} 元</td>
+
+                                <!--<td class=""><img src="{$vo.ss}" width="80"  onclick="preview('{$vo.ss}')"></td>-->
+                                <!-- <td class=" ">{$vo.ctime|date='Y-m-d H:i:s',###}</td> -->
+                                <td class="center ">
+                                    <div>
+                                        <a href="{:url('Dlc/device/set',array('device_id'=>$vo['device_id'],'p'=>$p))}" class="btn btn-success btn-xs" data-loader="App-loader" data-loadername="编辑设备"><i class="fa fa-edit"></i> 编辑</a>&nbsp;&nbsp;
+                                        <a href="{:url('Dlc/device/goods',array('device_id'=>$vo['device_id'],'page'=>$p))}" class="btn btn-info btn-xs" data-loader="App-loader" data-loadername="所属商品"><i class="fa fa-list"></i>所属商品</a>&nbsp;&nbsp; 
+                                        <a href="{:url('Dlc/device/order',array('device_id'=>$vo['device_id'],'page'=>$p))}" class="btn btn-warning btn-xs" data-loader="App-loader" data-loadername="设备订单"><i class="fa fa-calendar"></i>设备订单</a>&nbsp;&nbsp;    <a href="{:url('Dlc/device/setStatus',array('device_id'=>$vo['device_id']))}" class="btn btn-success btn-xs" data-type = "del"
+                                                                                                                                                                                                                                                                     data-ajax="{:url('Dlc/device/setStatus',array('device_id'=>$vo['device_id']))}"  data-content="你确定要重置吗，重置后设备会回到可开门状态，会对订单有影响！！！">
+                                        <i class="fa fa-edit"></i> 重置设备状态
+                                    </a> &nbsp;&nbsp;
+
+                                    <!--</div>-->
+                                    <!--<div>-->
+
+                                        <a href="{:url('Dlc/device/uploadlog',array('macno'=>$vo['macno']))}" class="btn btn-success btn-xs" data-type = "del"
+                                           data-ajax="{:url('Dlc/device/uploadlog',array('macno'=>$vo['macno']))}" style="margin: 10px 3px 0px 0px"  data-content="你确定要上传吗">
+                                            <i class="fa fa-edit"></i> 上传设备安卓端日志
+                                        </a> &nbsp;&nbsp;
+
+                                        <a href="http://{$_SERVER['HTTP_HOST']}/wxsite/Public/read_log/name/log{$date}_{$vo['macno']}.txt" class="btn btn-info btn-xs "
+                              style="margin: 10px 3px 0px 0px"  target="view_window">
+                                            <i class="fa fa-eye"></i>查看日志
+                                        </a>&nbsp;&nbsp;
+
+                                        <a href="{:url('Dlc/device/deviceError',array('device_id'=>$vo['device_id'],'page'=>$p))}" data-loader="App-loader" class="btn btn-warning btn-xs"   style="margin: 10px 3px 0px 0px"  >
+                                            <i class="fa fa-eye"></i> 查看设备商品差集
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <a href="{:url('Dlc/Statistics/samedaysales',array('device_id'=>$vo['device_id'],'p'=>$p))}" data-loader="App-loader" class="btn btn-warning btn-xs"   style="margin: 10px 3px 0px 0px"   data-loadername="当日销售统计">
+                                                <i class="fa fa-eye"></i> 当日销售统计
+                                        </a>
+                                        <!--<a href="{:url('Dlc/device/createRecord',array('device_id'=>$vo['device_id']))}" class="btn btn-success btn-xs" data-type = "del"-->
+                                           <!--data-ajax="{:url('Dlc/device/createRecord',array('device_id'=>$vo['device_id']))}" style="margin: 10px 3px 0px 0px" data-content="是否生成补货清单">-->
+                                            <!--<i class="fa fa-edit"></i> 生成补货清单-->
+                                        <!--</a> &nbsp;&nbsp;-->
+                                        <!--<a href="{:url('Dlc/device/deviceRecord',array('device_id'=>$vo['device_id'],'page'=>$p))}" style="margin: 10px 3px 0px 0px" class="btn btn-info btn-xs" data-loader="App-loader" data-loadername="设备销售清单"><i class="fa fa-eye"></i>设备销售清单</a>&nbsp;&nbsp;-->
+
+                                        <a href="{:url('Dlc/device/del',array('device_id'=>$vo['device_id']))}" class="btn btn-danger btn-xs" data-type = "del"
+                                         data-ajax="{:url('Dlc/device/del',array('device_id'=>$vo['device_id']))}" style="margin: 10px 3px 0px 0px">
+                                            <i class="fa fa-trash-o"></i> 删除
+                                        </a> &nbsp;&nbsp;
+                                        <a href="{:url('Dlc/device/updateversion',array('macno'=>$vo['macno']))}" class="btn btn-success btn-xs" data-type = "del"
+                                           data-ajax="{:url('Dlc/device/updateversion',array('macno'=>$vo['macno']))}" style="margin: 10px 3px 0px 0px"  data-content="你确定要更新吗">
+                                            <i class="fa fa-edit"></i> 更新设备版本
+                                        </a> &nbsp;&nbsp;
+
+                                        <!--{if condition="$vo.user_id neq 0"}-->
+                                            <!--<a href="{:url('Dlc/device/bindingDel',array('id'=>$vo['device_id']))}" class="btn btn-primary btn-xs" data-type = "jiebang"-->
+                                             <!--data-ajax="{:url('Dlc/device/bindingDel',array('id'=>$vo['device_id']))}" style="margin: 10px 3px 0px 0px">-->
+                                                <!--<i class="fa fa-unlock-alt"></i> 解除绑定-->
+                                            <!--</a> &nbsp;&nbsp;-->
+                                        <!--{else/}-->
+                                            <!--<a href="{:url('Dlc/device/binding',array('device_id'=>$vo['device_id'],'page'=>$p,'shop_id'=>$vo['shop_id']))}" class="btn btn-purple btn-xs" data-loader="App-loader" data-loadername="绑定员工" style="margin: 10px 3px 0px 0px><i class="fa fa-cogs"></i>绑定员工-->
+                                            <!--</a>&nbsp;&nbsp;-->
+                                            <!---->
+                                        <!--{/if}-->
+                                        
+                                    </div>
+                                    
+                                    
+                                </td>
+                            </tr>
+                        {/volist}
+                                                
+                    </tbody>
+                </table>
+
+                 <!-- style="line-height: 32px; height: 32px;" -->
+                <div class="row DTTTFooter">
+                {$page}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--全选特效封装/全部删除-->
+<script type="text/javascript">
+    //全选
+    var checkall=$('#App-table .App-checkall');
+    var checks=$('#App-table .App-check');
+    var trs=$('#App-table tbody tr');
+    $(checkall).on('click',function(){
+        if($(this).is(":checked")){         
+            $(checks).prop("checked","checked");
+        }else{
+            $(checks).removeAttr("checked");
+        }       
+    });
+    $(trs).on('click',function(){
+        var c=$(this).find("input[type=checkbox]");
+        if($(c).is(":checked")){
+            $(c).removeAttr("checked");
+        }else{
+            $(c).prop("checked","checked");
+        }       
+    });
+    //全删
+    $('#App-delall').on('click',function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择要删除的项目！');
+            return false;
+        }
+        var toajax="{:url('/Dlc/device/del')}"+"/device_id/"+chk;
+        // var toajax='/Dlc/device/del?device_id='+chk;
+        var funok=function(){
+            var callok=function(){
+                //成功删除后刷新
+                $('#refresh-toggler').trigger('click');
+                return false;
+            };
+            var callerr=function(){
+                //拦截错误
+                return false;
+            };
+            $.App.ajax('post',toajax,'nodata',callok,callerr);
+        }                       
+        $.App.confirm("确认要执行此操作吗？",funok);
+    });
+    $('#download').click(function(){
+        var checks=$(".App-check:checked");
+        var chk='';
+        $(checks).each(function(){
+            chk+=$(this).val()+',';
+        });
+        if(!chk){
+            $.App.alert('danger','请选择需要导出的设备号！');
+            return false;
+        }
+        // window.location.href="/Dlc/Device/download/ids/"+chk;
+        // return ;
+        $.post('/Dlc/Device/download',{ids:chk},function(a){
+            console.log(a.url);
+            if(a.status == 1) {
+                console.log(a.url);
+                window.location.href=a.url;
+            }
+        })
+    })
+</script>
+<!--/全选特效封装-->

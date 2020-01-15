@@ -1,0 +1,305 @@
+<div class="row">
+    <div class="col-xs-12 col-xs-12">
+        <div class="widget radius-bordered">
+            <div class="widget-header bg-blue">
+                <i class="widget-icon fa fa-arrow-down"></i>
+                <span class="widget-caption">订单详情</span>
+                <div class="widget-buttons">
+                    <a href="#" data-toggle="maximize">
+                        <i class="fa fa-expand"></i>
+                    </a>
+                    <a href="#" data-toggle="collapse">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                    <a href="#" data-toggle="dispose">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="widget-body">
+                <form id="AppForm" action="" method="post" class="form-horizontal"
+                      data-bv-message=""
+                      data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+                      data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
+                      data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                    <input type="hidden" name="discount_id" value="{$cache.discount_id}">
+                    <div class="form-title">
+                      {if condition="$type eq 1"}
+                        <a href="{:url('/dlc/order/index/',array('p'=>$p))}" class="btn btn-primary" data-loader="App-loader" data-loadername="订单列表">
+                            <i class="fa fa-mail-reply"></i>返回
+                        </a>
+                      {else/}
+                        <a href="{:url('/dlc/order/index/',array('p'=>$p,'id'=>$id,'type'=>$type,'pages'=>$pagess))}" class="btn btn-primary" data-loader="App-loader" data-loadername="商家订单列表">
+                            <i class="fa fa-mail-reply"></i>返回
+                        </a>
+                      {/if}
+                    </div>
+                    <!-- <div class="form-group"> -->
+                        <table  class="table table-bordered table-hover">
+                            <tr role="row">
+                                <th>商品名称</th>
+                                <th>商品图片</th>
+                                <th>购买数量</th>
+                                <th>设备商品单价</th>
+                                <th>商品单价</th>
+                                <th>商品成本价</th>
+                                <th>商品小计</th>
+                                <th>操作</th>
+                            </tr>
+                            {volist name="result.goods" id="vo"}
+                                <tr>   
+                                    <td>{$vo.title}</td>
+                                    <td><img src="http://{$_SERVER['HTTP_HOST']}/public{$vo.img}" style="width: 60px;height: 60px;"></td>
+                                    <td>{$vo.num} 件</td>
+                                    <td>{$vo.price} 元</td>
+                                    <td>{$vo.s_price} 元</td>
+                                    <td>{$vo.cost} 元</td>
+                                    <td>{$vo.count_price} 元</td>
+                                    <!--&lt;!&ndash; <td></td>-->
+                                    <td>
+                                        <a href="{:url('Dlc/order/inverseRecharge',array('order_id'=>$vo['order_id'],'price'=>$vo['price'],'info_id'=>$vo['info_id']))}" class="btn btn-info" data-type = "del" data-content="确认红充吗？宏冲后金额将不计入财务统计？"
+                                           data-ajax="{:url('Dlc/order/inverseRecharge',array('order_id'=>$vo['order_id'],'price'=>$vo['price'],'info_id'=>$vo['info_id']))}" style="margin: 10px 3px 0px 0px">
+                                        <i class="fa fa-edit"></i> 红充
+                                    </a></td>
+                                </tr>
+                            {/volist}
+                        </table>
+                    <div class="form-group">
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">订单编号<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control"  name="order_number" placeholder="必填" 
+							 data-bv-notempty="true"  
+							  data-bv-notempty-message="不能为空" value="{$result.order_number}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">用户昵称<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control"  name="username" placeholder="必填" 
+							 data-bv-notempty="true"  
+							  data-bv-notempty-message="不能为空" value="{$result.nickname}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">设备编号<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control"  name="username" placeholder="必填"
+							  data-bv-notempty="true"  
+							   data-bv-notempty-message="不能为空" value="{$result.macno}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">所属商家<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.shop_id eq '-1'"}
+                            <input type="text" class="form-control"  name="username" placeholder="必填" 
+							  data-bv-notempty="true" 
+							   data-bv-notempty-message="不能为空" value="所属平台">
+                            {else/}
+                                <input type="text" class="form-control"  name="username" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.user_name}">
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">网点名称<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control"  name="title" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.title}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">网点地址<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control"  name="address" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.address}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">购买数量<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control"  name="num" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.num}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">商品总价<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control"  name="total_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.total_price}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">实付金额<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.pay_price}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">订单优惠<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.discount_id eq 0"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="没有优惠">
+                            {else/}
+                                 <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="优惠金额:{$result.discount_money}">
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">交易编号<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.trade_number eq ''"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="暂无">
+                            {else/}
+                                 <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.trade_number}">
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">订单状态<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.status eq 2"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="未付款">
+                            {elseif condition="$result.status eq -1"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="已取消">
+                            {else/}
+                                 <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="已付款">
+                            {/if}
+                        </div>
+                    </div>
+                     <div class="form-group">
+                        <label class="col-lg-2 control-label">支付类型<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.pay_type eq 1"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="微信支付">
+                            {elseif condition="$result.pay_type eq 2"/}
+                                 <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="支付宝支付">
+                            {else/}
+                                <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="余额支付">
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">创建时间<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.ctime eq 0"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="暂无">
+                            {else/}
+                                 <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.ctime|date='Y-m-d H:i:s',###}">
+                            {/if}
+                        </div>
+                    </div>
+                     <div class="form-group">
+                        <label class="col-lg-2 control-label">开门时间<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.open_time eq 0"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="暂无">
+                            {else/}
+                                 <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.open_time|date='Y-m-d H:i:s',###}">
+                            {/if}
+                        </div>
+                    </div>
+                     <div class="form-group">
+                        <label class="col-lg-2 control-label">关门时间<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.close_time eq 0"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="暂无">
+                            {else/}
+                                 <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.close_time|date='Y-m-d H:i:s',###}">
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">支付时间<sup>*</sup></label>
+                        <div class="col-lg-4">
+                            {if condition="$result.pay_time eq 0"}
+                            <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="暂无">
+                            {else/}
+                                 <input type="text" class="form-control"  name="pay_price" placeholder="必填"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="不能为空" value="{$result.pay_time|date='Y-m-d H:i:s',###}">
+                            {/if}
+                        </div>
+                    </div>
+<!-- 
+                    <div class="form-group">
+                        <div class="col-lg-offset-2 col-lg-4">
+                            <button class="btn btn-primary btn-lg" type="submit">保存</button>&nbsp;&nbsp;&nbsp;&nbsp; -->
+                            <!--<button class="btn btn-palegreen btn-lg" >返回</button>-->
+                       <!--  </div>
+                    </div> -->
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!--面包屑导航封装-->
+<div id="tmpbread" style="display: none;">{$breadhtml}</div>
+<script type="text/javascript">
+    setBread($('#tmpbread').html());
+</script>
+<!--/面包屑导航封装-->
+<!--表单验证与提交封装-->
+<script type="text/javascript">
+    $('#AppForm').bootstrapValidator({
+        submitHandler: function (validator, form, submitButton) {
+            var oa='';
+            var checks=$('.oa-check');
+            $(checks).each(function(){
+                if($(this).is(":checked")){
+                    oa+=$(this).val()+',';
+                }
+            });
+            $('#oath').val(oa);
+            var tourl="{:url('Admin/MylDiscount/set')}";
+            var data=$('#AppForm').serialize();
+            $.App.ajax('post',tourl,data,null);
+            return false;
+        },
+    });
+</script>
+<!--/表单验证与提交封装-->
